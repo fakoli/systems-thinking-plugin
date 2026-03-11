@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "prompt",
+        "prompt": "Before proceeding, remember: separate extraction from synthesis. Preserve source anchors (file, section, page) on every finding. Do not collapse raw evidence into inferred conclusions until extraction is complete."
+      }
+    ],
+    "Stop": [
+      {
+        "type": "prompt",
+        "prompt": "Review the response you just produced. If it is a substantive analysis (not a simple factual answer or short clarification), check whether it includes: (1) explicit assumptions, (2) top risks, (3) unresolved questions, and (4) recommended next steps. If any of these are missing, append a brief note flagging what was omitted and why it matters."
+      }
+    ]
+  }
+}
