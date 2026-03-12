@@ -48,6 +48,10 @@ Actively search for these cost and capacity signals:
 - Search terms: `commitment`, `contract`, `term`, `lock-in`, `migration`, `portability`, `exit`, `minimum`, `annual`, `multi-year`, `reserved capacity`, `prepaid`
 - Look in: pricing pages, terms of service, enterprise agreements, migration guides
 
+## Reference Directory
+
+Check `reference/vendor_docs/` for pricing documentation, quota lists, and SLA details. These are curated reference materials that may contain cost information not present in the documents under active analysis. When vendor pricing from reference materials conflicts with the primary source, flag both values and note the discrepancy.
+
 ## Procedure
 
 1. **Receive input.** You will be given documents, pricing notes, or design assumptions to analyze.

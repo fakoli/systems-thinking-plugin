@@ -73,6 +73,10 @@ Actively search for these caveat categories using both structural reading and ta
 
 5. **Check for missing caveats.** For any infrastructure service, you would expect to find limits on: throughput, connections, storage, request size, timeout, retry behavior, failover behavior, and regional availability. If any of these are absent from the documentation, flag the gap.
 
+## Reference Directory
+
+Check `reference/vendor_docs/` for known limitation documents that may contain caveats not present in the primary input material. Prior caveat findings may exist in `reference/examples/` as sample outputs — use these to calibrate severity ratings and ensure nothing obvious is missed. Reference materials supplement but do not replace the primary analysis.
+
 ## Output Format
 
 ```

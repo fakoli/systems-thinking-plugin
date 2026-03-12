@@ -33,15 +33,15 @@ Adapt prior proven work to a new problem. Feed in a known-good design and a set 
 
 ## Quick start
 
-### 1. Populate your seed material
+### 1. Populate your reference material
 
-Drop source documents into the `.seed/` subdirectories:
+Drop source documents into the `reference/` subdirectories:
 
 ```
-.seed/
+reference/
 ├── previous_designs/    # Prior design docs, ADRs, architecture notes
 ├── vendor_docs/         # Vendor PDFs, pricing sheets, technical guides
-├── reference_prompts/   # Prompts and patterns that have worked before
+├── prompts/             # Prompts and patterns that have worked before
 └── examples/            # Example outputs showing the quality bar you want
 ```
 
@@ -52,7 +52,7 @@ The more relevant material you provide, the better the extraction agents perform
 For a vendor risk scan:
 ```
 /complexity-mapper
-Scan .seed/vendor_docs/vendor-x/ for hidden risks, quota limits, and operational constraints.
+Scan reference/vendor_docs/vendor-x/ for hidden risks, quota limits, and operational constraints.
 ```
 
 For a repo orientation:
@@ -64,7 +64,7 @@ Orient me to this repo. Map the major modules, flag complexity areas, and tell m
 For reusing a prior design:
 ```
 /pattern-remix
-Prior work: .seed/previous_designs/hub-spoke-v2/
+Prior work: reference/previous_designs/hub-spoke-v2/
 Target: Extend to a third cloud provider.
 Constraints: No BGP community support on the new provider.
 ```
@@ -93,7 +93,8 @@ systems-thinking-plugin/
 │   │   ├── decision-brief.md
 │   │   └── architecture-risk-review.md
 │   └── settings.json        # Hooks configuration
-├── .seed/                   # Your source material goes here
+├── specs/                   # Design specifications (00-11 numbered files)
+├── reference/               # Your source material goes here
 ├── docs/                    # Reference documentation
 │   ├── output-contracts.md          # The 5 output format definitions
 │   ├── agent-design-principles.md   # How agents are designed and why
@@ -105,17 +106,17 @@ systems-thinking-plugin/
 └── README.md
 ```
 
-## How to populate .seed/ for better results
+## How to populate reference/ for better results
 
 The agents work best when they have real source material to extract from. Here is what to put in each directory:
 
-**`.seed/previous_designs/`** — Drop in design documents, architecture decision records, implementation plans, or Terraform module structures from prior work you want to reuse or reference. The pattern-remix workflow reads from here.
+**`reference/previous_designs/`** — Drop in design documents, architecture decision records, implementation plans, or Terraform module structures from prior work you want to reuse or reference. The pattern-remix workflow reads from here.
 
-**`.seed/vendor_docs/`** — Vendor technical documentation, pricing pages, SLA descriptions, quota tables, API references. The complexity-mapper and context-sharding workflows read from here when doing vendor evaluations.
+**`reference/vendor_docs/`** — Vendor technical documentation, pricing pages, SLA descriptions, quota tables, API references. The complexity-mapper and context-sharding workflows read from here when doing vendor evaluations.
 
-**`.seed/reference_prompts/`** — Prompts, prompt chains, or instruction sets that have produced good results in the past. These help calibrate agent behavior to your preferred style and depth.
+**`reference/prompts/`** — Prompts, prompt chains, or instruction sets that have produced good results in the past. These help calibrate agent behavior to your preferred style and depth.
 
-**`.seed/examples/`** — Example outputs showing the quality bar and format you expect. If you have a particularly good decision brief or risk summary from prior work, drop it here.
+**`reference/examples/`** — Example outputs showing the quality bar and format you expect. If you have a particularly good decision brief or risk summary from prior work, drop it here.
 
 You do not need all four directories populated to start. One vendor doc or one prior design is enough for a useful run.
 

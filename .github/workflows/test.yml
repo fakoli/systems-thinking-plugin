@@ -1,0 +1,139 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  schedule:
+    - cron: "0 2 * * *" # nightly at 2am UTC
+
+jobs:
+  unit-and-contract:
+    name: Unit & Contract Tests
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r tests/requirements.txt
+
+      - name: Run unit and contract tests
+        run: pytest tests/unit tests/contracts -v --tb=short --junitxml=test-results/results.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-contract-results
+          path: test-results/
+          retention-days: 14
+
+  evals:
+    name: Eval Tests
+    runs-on: ubuntu-latest
+    needs: unit-and-contract
+    if: >
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-evals')) ||
+      github.event_name == 'schedule'
+    continue-on-error: ${{ github.event_name == 'schedule' }}
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r tests/requirements.txt
+
+      - name: Install Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run eval tests
+        run: pytest tests/evals -v --tb=long -m eval --timeout=300 --junitxml=eval-results/results.xml
+
+      - name: Upload eval results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: |
+            eval-results/
+            tests/evals/output/
+          retention-days: 30
+
+  validate-plugin-structure:
+    name: Validate Plugin Structure
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate settings.json
+        run: python -m json.tool .claude/settings.json > /dev/null
+
+      - name: Validate YAML frontmatter in agent and skill files
+        run: |
+          python3 << 'SCRIPT'
+          import pathlib
+          import sys
+
+          errors = []
+          for pattern in [".claude/agents/*.md", ".claude/skills/*.md"]:
+              for path in sorted(pathlib.Path(".").glob(pattern)):
+                  content = path.read_text(encoding="utf-8")
+                  if not content.startswith("---"):
+                      errors.append(f"{path}: missing opening '---' frontmatter delimiter")
+                      continue
+                  second = content.find("---", 3)
+                  if second == -1:
+                      errors.append(f"{path}: missing closing '---' frontmatter delimiter")
+
+          if errors:
+              for e in errors:
+                  print(f"::error::{e}")
+              sys.exit(1)
+
+          print("All agent/skill markdown files have valid frontmatter delimiters.")
+          SCRIPT
+
+      - name: Check file line counts
+        run: |
+          python3 << 'SCRIPT'
+          import pathlib
+
+          threshold = 500
+          warned = False
+          for path in sorted(pathlib.Path(".").rglob("*")):
+              if not path.is_file():
+                  continue
+              if path.suffix not in (".md", ".yml", ".yaml", ".json", ".py", ".txt"):
+                  continue
+              try:
+                  lines = len(path.read_text(encoding="utf-8").splitlines())
+              except (UnicodeDecodeError, PermissionError):
+                  continue
+              if lines > threshold:
+                  print(f"::warning file={path}::{path} has {lines} lines (threshold: {threshold})")
+                  warned = True
+
+          if not warned:
+              print(f"All tracked files are within the {threshold}-line threshold.")
+          SCRIPT

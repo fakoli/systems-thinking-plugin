@@ -37,6 +37,8 @@ Do **not** use Context Sharding when:
 
 ### Step 1: Invoke doc-indexer to Map All Provided Materials
 
+When inventorying materials to shard, also check `reference/vendor_docs/` and `reference/previous_designs/` for files relevant to the extraction goal. Include relevant reference materials as additional input sources.
+
 Run the `doc-indexer` agent on the full set of provided materials. The doc-indexer produces:
 
 - A complete inventory of all documents/files with size, type, and topic classification.
@@ -48,6 +50,8 @@ This output is the foundation for the sharding plan. Do not skip this step and s
 ### Step 2: Design the Sharding Plan
 
 Using the doc-indexer output, design a sharding plan that optimizes for:
+
+**Source separation**: Keep reference materials (from `reference/`) in separate shards from user-provided materials to maintain source clarity. This makes it easy to distinguish findings derived from reference context vs. primary inputs.
 
 **Shard independence**: Each shard should be processable without requiring context from other shards. The less cross-shard dependency, the higher the quality of parallel extraction.
 

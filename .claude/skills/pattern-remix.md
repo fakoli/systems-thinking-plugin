@@ -40,8 +40,11 @@ Do **not** use Pattern Remix when:
 Collect all prior artifacts that may be structurally relevant to the new problem. Check the following sources in order:
 
 1. `.seed/previous_designs/` directory for indexed prior work.
-2. User-specified file paths or repositories.
-3. Context Packets from prior workflow runs that contain relevant design extractions.
+2. `reference/previous_designs/` directory for additional prior designs, proposals, and architecture notes.
+3. User-specified file paths or repositories.
+4. Context Packets from prior workflow runs that contain relevant design extractions.
+
+When scanning `reference/previous_designs/`, present any found materials to the user for selection before proceeding — not all prior work will be relevant to the current remix.
 
 For each artifact, note:
 - What problem it solved.
@@ -63,6 +66,8 @@ Before remixing, establish alignment with the user on:
 Document these as structured inputs. Do not proceed with ambiguity on target state or hard constraints.
 
 ### Step 3: Invoke pattern-remix-planner Agent
+
+Before invoking, check `reference/prompts/` for analysis prompts relevant to the problem domain. If found, use them to guide the remix approach and framing. Also check `reference/examples/` for sample Pattern Remix Draft outputs to calibrate quality and depth expectations for the output.
 
 Pass the following context to the `pattern-remix-planner` agent:
 

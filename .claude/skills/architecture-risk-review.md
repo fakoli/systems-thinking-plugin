@@ -39,6 +39,13 @@ Do **not** use Architecture Risk Review when:
 
 ### Step 1: Invoke doc-indexer on Architecture Documents
 
+Before running the doc-indexer, check these reference directories for supplementary material:
+
+- `reference/previous_designs/` — prior architecture work that may reveal historical risk patterns or recurring failure modes relevant to this review.
+- `reference/vendor_docs/` — vendor documentation covering known limitations, quotas, or service constraints relevant to the architecture under review.
+
+Include any relevant reference materials as additional input to the doc-indexer.
+
 Run the `doc-indexer` agent on all provided architecture documents to produce:
 
 - A component inventory: every named service, database, queue, cache, API, and external dependency.
@@ -104,6 +111,8 @@ The synthesis must:
    - **Low**: Technical debt or minor resilience gap. Track and address opportunistically.
 
 ### Step 5: Present Findings with Severity Ratings and Source Anchors
+
+Cross-reference findings against any prior risk summaries or architecture review examples in `reference/examples/` to ensure consistent severity calibration and output format.
 
 Deliver the Hidden Risk Summary with:
 

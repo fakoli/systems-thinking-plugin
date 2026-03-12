@@ -52,6 +52,10 @@ Actively search for these dependency and architecture signals:
 - Search terms: `deploy`, `release`, `rollback`, `blue-green`, `canary`, `pipeline`, `CI/CD`, `build`, `artifact`, `registry`, `image`, `container`, `orchestrator`, `terraform`, `infrastructure as code`, `IaC`, `bootstrap`, `initialization`
 - Significance: Deployment-time dependencies can block delivery even when runtime dependencies are healthy.
 
+## Reference Directory
+
+Check `reference/previous_designs/` for prior architecture documents that may reveal historical dependency patterns, known failure modes, or previously identified choke points relevant to the current analysis. When prior designs document dependencies that are absent from the current material, flag the gap — it may indicate an undocumented dependency that still exists.
+
 ## Procedure
 
 1. **Receive input.** You will be given design notes, architecture docs, or extracted findings from other agents.

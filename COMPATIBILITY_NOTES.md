@@ -7,7 +7,7 @@ This package is built for **Claude Code local project usage**. All agents, skill
 - Agents are Markdown files in `.claude/agents/`
 - Skills are Markdown playbooks in `.claude/skills/`
 - Hooks are configured in `.claude/settings.json`
-- Context comes from local files in `.seed/`
+- Context comes from local files in `reference/`
 
 This is the supported and tested workflow. Get this working well before considering other platforms.
 
@@ -22,7 +22,7 @@ Cursor compatibility is a future goal, not a current priority. The core ideas (e
 | `.claude/agents/` (Markdown agent definitions) | `.cursorrules` or custom rules files | Moderate — rewrite as rule directives rather than agent personas |
 | `.claude/skills/` (Markdown playbooks) | Prompt templates or composer instructions | Moderate — restructure as step-by-step prompts without agent delegation |
 | `.claude/settings.json` hooks | No direct equivalent | High — Cursor does not have a hook system; would need to embed reminders in rules or rely on user discipline |
-| `.seed/` directory for source material | Same approach (local files) | Low — file-based context works similarly |
+| `reference/` directory for source material | Same approach (local files) | Low — file-based context works similarly |
 | Output contracts | Same approach (prompt instructions) | Low — include contract definitions in rules or prompt templates |
 | Subagent delegation (parallel extraction) | Not natively supported | High — Cursor does not have a subagent model; would need to simulate with sequential prompts or accept single-pass analysis |
 
@@ -39,7 +39,7 @@ Cursor compatibility is a future goal, not a current priority. The core ideas (e
 ### Known unknowns
 
 - Whether Cursor's rules system supports the level of structured output formatting these contracts require.
-- How Cursor handles large context from `.seed/` directories — whether it has similar file-reading capabilities or requires explicit file references.
+- How Cursor handles large context from `reference/` directories — whether it has similar file-reading capabilities or requires explicit file references.
 - Whether Cursor's composer mode can approximate the multi-step workflows that skills define.
 - How Cursor versioning and sharing works for rule sets (relevant for team adoption).
 

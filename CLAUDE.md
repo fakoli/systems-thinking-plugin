@@ -100,20 +100,20 @@ All deliverables must follow these structures:
 - No MCP in v1 unless clearly justified
 - No autonomous long-running systems
 
-## Seed Directory (`.seed/`)
+## Reference Directory (`reference/`)
 
-Reference material that informs package design:
+An active reference library of material that informs agent behavior and grounds outputs in real prior work:
 
 | Folder | Contents |
 |--------|----------|
 | `previous_designs/` | Prior design docs, proposals, architecture notes, ADRs |
 | `vendor_docs/` | Vendor documentation, pricing, quotas, limitations |
-| `reference_prompts/` | Effective prompts and patterns that worked before |
+| `prompts/` | Effective prompts and patterns that worked before |
 | `examples/` | Example outputs showing desired behavior |
 
 ## Build Phases
 
-- **Phase 0:** Infer resources from `.seed/` and existing repo conventions
+- **Phase 0:** Infer resources from `reference/` and existing repo conventions
 - **Phase 1:** Discovery — propose structure, identify what goes where, list assumptions
 - **Phase 2:** Scaffold — create folders, write subagents, skills, hooks, config
 - **Phase 3:** Refine — tighten prompts, improve consistency, add usage examples

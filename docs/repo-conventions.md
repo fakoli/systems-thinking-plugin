@@ -22,10 +22,11 @@ systems-thinking-plugin/
 │   ├── agents/          # Subagent definitions (one per file)
 │   ├── skills/          # Skill playbooks (one per file)
 │   └── settings.json    # Hooks and Claude Code configuration
-├── .seed/               # Input material for context and grounding
+├── specs/               # Design specifications (numbered files)
+├── reference/           # Input material for context and grounding
 │   ├── previous_designs/
 │   ├── vendor_docs/
-│   ├── reference_prompts/
+│   ├── prompts/
 │   └── examples/
 ├── docs/                # Reference documentation
 │   ├── output-contracts.md
@@ -43,7 +44,8 @@ systems-thinking-plugin/
 |--------|---------------|----------------------|
 | `.claude/agents/` | One Markdown file per subagent, defining its role, inputs, outputs, and behavioral rules | Multi-agent orchestration logic, skill definitions |
 | `.claude/skills/` | One Markdown playbook per skill, defining when/inputs/process/output/failure-modes | Agent definitions, raw documentation |
-| `.seed/` | Source material that informs agent behavior — prior designs, vendor docs, reference prompts, examples | Generated outputs, scratch files |
+| `specs/` | Design specifications — numbered spec files defining the plugin's design and contracts | Generated outputs, scratch files |
+| `reference/` | Source material that informs agent behavior — prior designs, vendor docs, prompts, examples | Generated outputs, scratch files |
 | `docs/` | Reference documentation about the plugin's design, contracts, and conventions | Tutorials, marketing material, generated outputs |
 | `examples/` | Usage scenarios showing how to invoke skills and what to expect | Agent or skill definitions |
 

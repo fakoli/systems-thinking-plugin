@@ -38,6 +38,8 @@ Do **not** use Complexity Mapper when:
 
 ### Step 1: Invoke doc-indexer on Provided Materials
 
+Before starting extraction, check `reference/vendor_docs/` for pre-loaded vendor documentation relevant to the analysis target (e.g., service limits, pricing pages, known issues). Include any relevant vendor docs alongside user-provided materials as additional input for the doc-indexer.
+
 Run the `doc-indexer` agent on all provided documentation to produce a structural map of the material:
 
 - Section inventory with topic classification.
@@ -89,6 +91,8 @@ Pass all three extraction outputs plus the original design assumptions and const
 - Recommended investigation or mitigation.
 
 ### Step 5: Present Findings to User
+
+After synthesis, compare the output format and depth against any examples in `reference/examples/` to ensure consistency with established quality standards.
 
 Deliver the Complexity Heat Map and Hidden Risk Summary with:
 
