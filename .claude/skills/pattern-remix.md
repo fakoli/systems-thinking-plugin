@@ -26,12 +26,12 @@ Do **not** use Pattern Remix when:
 
 ## Inputs Required
 
-| Input | Required | Description |
-|---|---|---|
-| Prior artifacts | Yes | Designs, implementations, architecture docs, or decision records from previous successful work. Source from `.seed/previous_designs/` or user-specified locations. |
-| Target state | Yes | Clear description of what the new design must achieve — goals, success criteria, user/system requirements. |
-| Constraints | Yes | Hard boundaries: budget, timeline, technology mandates, compliance requirements, team capabilities. |
-| Anti-patterns | No | Known failure modes, rejected approaches, or patterns explicitly ruled out for the new context. |
+| Input           | Required | Description                                                                                                                                                        |
+| --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Prior artifacts | Yes      | Designs, implementations, architecture docs, or decision records from previous successful work. Source from `.seed/previous_designs/` or user-specified locations. |
+| Target state    | Yes      | Clear description of what the new design must achieve — goals, success criteria, user/system requirements.                                                         |
+| Constraints     | Yes      | Hard boundaries: budget, timeline, technology mandates, compliance requirements, team capabilities.                                                                |
+| Anti-patterns   | No       | Known failure modes, rejected approaches, or patterns explicitly ruled out for the new context.                                                                    |
 
 ## Process Steps
 
@@ -47,6 +47,7 @@ Collect all prior artifacts that may be structurally relevant to the new problem
 When scanning `reference/previous_designs/`, present any found materials to the user for selection before proceeding — not all prior work will be relevant to the current remix.
 
 For each artifact, note:
+
 - What problem it solved.
 - What constraints it operated under.
 - What trade-offs it made and why.
@@ -138,11 +139,11 @@ The output is a **Pattern Remix Draft** conforming to the output contract:
 
 ## Failure Modes and Caution Points
 
-| Failure Mode | Signal | Response |
-|---|---|---|
-| No relevant prior work available | Step 1 yields no artifacts with structural similarity | Stop. Inform user. Recommend clean design or broader source gathering via `context-sharding`. |
+| Failure Mode                               | Signal                                                                                     | Response                                                                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| No relevant prior work available           | Step 1 yields no artifacts with structural similarity                                      | Stop. Inform user. Recommend clean design or broader source gathering via `context-sharding`.                      |
 | Prior work is from a very different domain | Artifact annotations show fundamentally different problem structure, users, or constraints | Proceed with caution. Flag low confidence in the remix. Recommend treating the output as inspiration, not a draft. |
-| Constraints contradict prior patterns | Step 2 reveals hard constraints that invalidate core decisions in the prior work | Identify which elements cannot be reused. If the majority are invalidated, recommend clean design instead. |
-| Over-fitting to prior work | Draft reuses elements without meaningful adaptation | Review Step 4 checklist. Ensure every reused element has an explicit justification for why it still applies. |
-| Assumption drift | Assumptions from prior work are carried forward without examination | Enforce the Carried Assumptions section. Every assumption must have a validity assessment. |
-| Anti-pattern reintroduction | Draft includes patterns the user explicitly ruled out | Check Step 4 anti-pattern compliance. Reject and re-invoke if violations are found. |
+| Constraints contradict prior patterns      | Step 2 reveals hard constraints that invalidate core decisions in the prior work           | Identify which elements cannot be reused. If the majority are invalidated, recommend clean design instead.         |
+| Over-fitting to prior work                 | Draft reuses elements without meaningful adaptation                                        | Review Step 4 checklist. Ensure every reused element has an explicit justification for why it still applies.       |
+| Assumption drift                           | Assumptions from prior work are carried forward without examination                        | Enforce the Carried Assumptions section. Every assumption must have a validity assessment.                         |
+| Anti-pattern reintroduction                | Draft includes patterns the user explicitly ruled out                                      | Check Step 4 anti-pattern compliance. Reject and re-invoke if violations are found.                                |

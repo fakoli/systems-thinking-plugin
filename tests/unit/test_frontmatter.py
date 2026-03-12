@@ -6,7 +6,6 @@ import pytest
 
 from tests.conftest import PLUGIN_ROOT, parse_frontmatter
 
-
 AGENTS_DIR = PLUGIN_ROOT / ".claude" / "agents"
 SKILLS_DIR = PLUGIN_ROOT / ".claude" / "skills"
 
@@ -60,9 +59,7 @@ def test_agent_names_are_kebab_case(agent_file):
     """Agent frontmatter 'name' must be kebab-case."""
     fm, _ = parse_frontmatter(agent_file)
     name = fm.get("name", "")
-    assert KEBAB_RE.match(name), (
-        f"{agent_file.name}: name '{name}' is not kebab-case"
-    )
+    assert KEBAB_RE.match(name), f"{agent_file.name}: name '{name}' is not kebab-case"
 
 
 # ── Description quality ──────────────────────────────────────────────────────
@@ -76,9 +73,7 @@ def test_agent_names_are_kebab_case(agent_file):
 def test_frontmatter_descriptions_are_nonempty(md_file):
     fm, _ = parse_frontmatter(md_file)
     desc = fm.get("description", "")
-    assert desc and str(desc).strip(), (
-        f"{md_file.name} has an empty description"
-    )
+    assert desc and str(desc).strip(), f"{md_file.name} has an empty description"
 
 
 # ── Tool scoping ─────────────────────────────────────────────────────────────
@@ -89,9 +84,5 @@ def test_agent_frontmatter_has_allowed_tools(agent_file):
     """Each agent must declare its allowed tools as a list."""
     fm, _ = parse_frontmatter(agent_file)
     tools_key = "allowed_tools" if "allowed_tools" in fm else "tools"
-    assert tools_key in fm, (
-        f"{agent_file.name} missing 'allowed_tools' or 'tools'"
-    )
-    assert isinstance(fm[tools_key], list), (
-        f"{agent_file.name}: {tools_key} should be a list"
-    )
+    assert tools_key in fm, f"{agent_file.name} missing 'allowed_tools' or 'tools'"
+    assert isinstance(fm[tools_key], list), f"{agent_file.name}: {tools_key} should be a list"

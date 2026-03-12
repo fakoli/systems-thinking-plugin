@@ -6,7 +6,6 @@ import pytest
 
 from tests.conftest import PLUGIN_ROOT, parse_frontmatter
 
-
 AGENTS_DIR = PLUGIN_ROOT / ".claude" / "agents"
 SKILLS_DIR = PLUGIN_ROOT / ".claude" / "skills"
 

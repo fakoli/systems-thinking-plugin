@@ -6,7 +6,6 @@ import pytest
 
 from tests.conftest import PLUGIN_ROOT, parse_frontmatter
 
-
 AGENTS_DIR = PLUGIN_ROOT / ".claude" / "agents"
 
 EXTRACTION_AGENTS = [
@@ -25,8 +24,15 @@ SYNTHESIS_AGENTS = [
 ALL_AGENTS = EXTRACTION_AGENTS + SYNTHESIS_AGENTS
 
 VALID_TOOLS = {
-    "Read", "Write", "Edit", "Glob", "Grep",
-    "Bash", "Agent", "WebSearch", "WebFetch",
+    "Read",
+    "Write",
+    "Edit",
+    "Glob",
+    "Grep",
+    "Bash",
+    "Agent",
+    "WebSearch",
+    "WebFetch",
 }
 
 
@@ -63,9 +69,7 @@ def test_synthesis_agents_mention_uncertainty(filename):
     body = _read_body(filename).lower()
     keywords = ["assumption", "uncertainty", "unresolved", "unknown"]
     found = [kw for kw in keywords if kw in body]
-    assert found, (
-        f"{filename} should mention at least one of: {keywords}"
-    )
+    assert found, f"{filename} should mention at least one of: {keywords}"
 
 
 # ── Source anchors ───────────────────────────────────────────────────────────
@@ -76,9 +80,9 @@ def test_agents_mention_source_anchors(filename):
     """Every agent must reference source anchors."""
     body = _read_body(filename).lower()
     assert "source" in body, f"{filename} does not mention 'source'"
-    assert any(
-        word in body for word in ("anchor", "reference", "citation")
-    ), f"{filename} does not mention anchor/reference/citation"
+    assert any(word in body for word in ("anchor", "reference", "citation")), (
+        f"{filename} does not mention anchor/reference/citation"
+    )
 
 
 # ── Structured output ───────────────────────────────────────────────────────
@@ -89,9 +93,7 @@ def test_agents_have_structured_output_section(filename):
     """Every agent should have an output-related heading."""
     body = _read_body(filename)
     pattern = re.compile(r"^#{2,3}\s+[Oo]utputs?", re.MULTILINE)
-    assert pattern.search(body), (
-        f"{filename} is missing an ## Output or ### Output(s) section"
-    )
+    assert pattern.search(body), f"{filename} is missing an ## Output or ### Output(s) section"
 
 
 # ── Extraction behavior ─────────────────────────────────────────────────────
@@ -101,9 +103,7 @@ def test_agents_have_structured_output_section(filename):
 def test_extraction_agents_have_extraction_instructions(filename):
     """Extraction agents must contain instructions about extraction."""
     body = _read_body(filename).lower()
-    assert "extract" in body, (
-        f"{filename} does not contain extraction instructions"
-    )
+    assert "extract" in body, f"{filename} does not contain extraction instructions"
 
 
 # ── Tool scoping ────────────────────────────────────────────────────────────
@@ -116,6 +116,4 @@ def test_allowed_tools_are_valid(filename):
     tools_key = "allowed_tools" if "allowed_tools" in fm else "tools"
     tools = fm.get(tools_key, [])
     invalid = [t for t in tools if t not in VALID_TOOLS]
-    assert not invalid, (
-        f"{filename} has invalid tools: {invalid}. Allowed: {VALID_TOOLS}"
-    )
+    assert not invalid, f"{filename} has invalid tools: {invalid}. Allowed: {VALID_TOOLS}"

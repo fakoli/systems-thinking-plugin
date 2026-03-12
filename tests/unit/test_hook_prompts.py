@@ -94,9 +94,7 @@ def test_hook_prompts_are_concise(hooks):
         for i, entry in enumerate(entries):
             if "prompt" in entry:
                 length = len(entry["prompt"])
-                assert length < 500, (
-                    f"{hook_type}[{i}] prompt is {length} chars (max 500)"
-                )
+                assert length < 500, f"{hook_type}[{i}] prompt is {length} chars (max 500)"
 
 
 def test_no_bash_hooks(hooks):

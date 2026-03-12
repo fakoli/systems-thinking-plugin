@@ -17,14 +17,14 @@ Cursor compatibility is a future goal, not a current priority. The core ideas (e
 
 ### What would need to change for Cursor
 
-| Claude Code concept | Cursor equivalent | Migration effort |
-|--------------------|--------------------|-----------------|
-| `.claude/agents/` (Markdown agent definitions) | `.cursorrules` or custom rules files | Moderate — rewrite as rule directives rather than agent personas |
-| `.claude/skills/` (Markdown playbooks) | Prompt templates or composer instructions | Moderate — restructure as step-by-step prompts without agent delegation |
-| `.claude/settings.json` hooks | No direct equivalent | High — Cursor does not have a hook system; would need to embed reminders in rules or rely on user discipline |
-| `reference/` directory for source material | Same approach (local files) | Low — file-based context works similarly |
-| Output contracts | Same approach (prompt instructions) | Low — include contract definitions in rules or prompt templates |
-| Subagent delegation (parallel extraction) | Not natively supported | High — Cursor does not have a subagent model; would need to simulate with sequential prompts or accept single-pass analysis |
+| Claude Code concept                            | Cursor equivalent                         | Migration effort                                                                                                            |
+| ---------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `.claude/agents/` (Markdown agent definitions) | `.cursorrules` or custom rules files      | Moderate — rewrite as rule directives rather than agent personas                                                            |
+| `.claude/skills/` (Markdown playbooks)         | Prompt templates or composer instructions | Moderate — restructure as step-by-step prompts without agent delegation                                                     |
+| `.claude/settings.json` hooks                  | No direct equivalent                      | High — Cursor does not have a hook system; would need to embed reminders in rules or rely on user discipline                |
+| `reference/` directory for source material     | Same approach (local files)               | Low — file-based context works similarly                                                                                    |
+| Output contracts                               | Same approach (prompt instructions)       | Low — include contract definitions in rules or prompt templates                                                             |
+| Subagent delegation (parallel extraction)      | Not natively supported                    | High — Cursor does not have a subagent model; would need to simulate with sequential prompts or accept single-pass analysis |
 
 ### Key differences that affect design
 

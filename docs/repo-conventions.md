@@ -40,14 +40,14 @@ systems-thinking-plugin/
 
 ### Folder purposes
 
-| Folder | What goes here | What does not go here |
-|--------|---------------|----------------------|
-| `.claude/agents/` | One Markdown file per subagent, defining its role, inputs, outputs, and behavioral rules | Multi-agent orchestration logic, skill definitions |
-| `.claude/skills/` | One Markdown playbook per skill, defining when/inputs/process/output/failure-modes | Agent definitions, raw documentation |
-| `specs/` | Design specifications — numbered spec files defining the plugin's design and contracts | Generated outputs, scratch files |
-| `reference/` | Source material that informs agent behavior — prior designs, vendor docs, prompts, examples | Generated outputs, scratch files |
-| `docs/` | Reference documentation about the plugin's design, contracts, and conventions | Tutorials, marketing material, generated outputs |
-| `examples/` | Usage scenarios showing how to invoke skills and what to expect | Agent or skill definitions |
+| Folder            | What goes here                                                                              | What does not go here                              |
+| ----------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `.claude/agents/` | One Markdown file per subagent, defining its role, inputs, outputs, and behavioral rules    | Multi-agent orchestration logic, skill definitions |
+| `.claude/skills/` | One Markdown playbook per skill, defining when/inputs/process/output/failure-modes          | Agent definitions, raw documentation               |
+| `specs/`          | Design specifications — numbered spec files defining the plugin's design and contracts      | Generated outputs, scratch files                   |
+| `reference/`      | Source material that informs agent behavior — prior designs, vendor docs, prompts, examples | Generated outputs, scratch files                   |
+| `docs/`           | Reference documentation about the plugin's design, contracts, and conventions               | Tutorials, marketing material, generated outputs   |
+| `examples/`       | Usage scenarios showing how to invoke skills and what to expect                             | Agent or skill definitions                         |
 
 ---
 

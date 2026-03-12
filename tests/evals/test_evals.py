@@ -16,17 +16,18 @@ from __future__ import annotations
 import shutil
 import subprocess
 import tempfile
-import time
 from pathlib import Path
-from typing import Any
 
 import pytest
 import yaml
 
-from tests.evals.graders.file_exists import grade_files_exist
-from tests.evals.graders.section_check import grade_sections
-from tests.evals.graders.forbidden_check import grade_no_forbidden_files, grade_no_forbidden_patterns
 from tests.evals.graders.composite import grade_composite
+from tests.evals.graders.file_exists import grade_files_exist
+from tests.evals.graders.forbidden_check import (
+    grade_no_forbidden_files,
+    grade_no_forbidden_patterns,
+)
+from tests.evals.graders.section_check import grade_sections
 
 HARNESS_DIR = Path(__file__).resolve().parent
 CASES_DIR = HARNESS_DIR / "cases"
@@ -98,7 +99,11 @@ def _run_single_grader(outcome: dict, workdir: Path, expected: bool) -> dict:
         filepath = _resolve_file(outcome["file"], workdir)
         return grade_no_forbidden_patterns(filepath, outcome["patterns"])
 
-    return {"pass": False, "score": 0.0, "error": f"Unknown outcome type: {outcome_type}"}
+    return {
+        "pass": False,
+        "score": 0.0,
+        "error": f"Unknown outcome type: {outcome_type}",
+    }
 
 
 # Collect case files for parametrization
@@ -130,7 +135,13 @@ def test_eval_case(case_path: Path) -> None:
 
         timeout = case.get("timeout", 120)
         proc = subprocess.run(
-            ["claude", "--print", "--dangerously-skip-permissions", "-p", case["prompt"]],
+            [
+                "claude",
+                "--print",
+                "--dangerously-skip-permissions",
+                "-p",
+                case["prompt"],
+            ],
             cwd=workdir,
             capture_output=True,
             text=True,

@@ -12,12 +12,12 @@ Interconnect integrates natively with CloudMesh VPC, CloudMesh Kubernetes Engine
 
 Interconnect pricing is based on three components:
 
-| Component            | Rate                              |
-|----------------------|-----------------------------------|
-| Attachment (per hub) | $0.05/hr per attachment           |
-| Data processed       | $0.02/GB for first 10 TB/month   |
-| Data processed       | $0.01/GB for next 40 TB/month    |
-| Data processed       | $0.005/GB above 50 TB/month      |
+| Component            | Rate                           |
+| -------------------- | ------------------------------ |
+| Attachment (per hub) | $0.05/hr per attachment        |
+| Data processed       | $0.02/GB for first 10 TB/month |
+| Data processed       | $0.01/GB for next 40 TB/month  |
+| Data processed       | $0.005/GB above 50 TB/month    |
 
 Prices above reflect intra-region traffic only. Cross-region data transfer incurs an additional surcharge depending on region pair (see Data Transfer section below).
 
@@ -27,14 +27,14 @@ Committed-use discounts of 20% are available on 1-year terms and 35% on 3-year t
 
 ## Quotas and Limits
 
-| Resource                        | Default Limit | Maximum (with support request) |
-|---------------------------------|---------------|-------------------------------|
-| Hubs per account                | 5             | 25                            |
-| Attachments per hub             | 20            | 50                            |
-| Routes per hub route table      | 200           | 1,000                         |
-| Bandwidth per attachment        | 10 Gbps       | 100 Gbps                     |
-| Total bandwidth per hub         | 50 Gbps       | 200 Gbps                     |
-| BGP sessions per attachment     | 2              | 4                             |
+| Resource                    | Default Limit | Maximum (with support request) |
+| --------------------------- | ------------- | ------------------------------ |
+| Hubs per account            | 5             | 25                             |
+| Attachments per hub         | 20            | 50                             |
+| Routes per hub route table  | 200           | 1,000                          |
+| Bandwidth per attachment    | 10 Gbps       | 100 Gbps                       |
+| Total bandwidth per hub     | 50 Gbps       | 200 Gbps                       |
+| BGP sessions per attachment | 2             | 4                              |
 
 Quota increases require 5 business days to process. Requests above the documented maximum limits require architecture review approval and may take up to 30 business days.^1
 
@@ -69,6 +69,7 @@ Gateway Bridge enables direct peering with AWS, Azure, and GCP through managed i
 CloudMesh Interconnect carries a **99.95% monthly availability SLA** for hubs deployed in GA regions with redundant attachments (minimum two attachments in separate availability zones).
 
 **SLA Exclusions:**
+
 - Single-attachment hubs are not covered
 - Hubs in preview regions are not covered
 - Performance (latency/throughput) is not guaranteed under the SLA; only reachability is measured
@@ -84,12 +85,12 @@ Intra-region data transfer between attachments on the same hub is billed at the 
 
 **Cross-region data transfer** incurs additional charges:
 
-| Route                                         | Surcharge (per GB) |
-|-----------------------------------------------|-------------------|
-| Within same continent                         | $0.02             |
-| Intercontinental (e.g., North America to EU)  | $0.05             |
-| To/from premium-tier regions                  | $0.08             |
-| To/from preview regions                       | $0.12             |
+| Route                                        | Surcharge (per GB) |
+| -------------------------------------------- | ------------------ |
+| Within same continent                        | $0.02              |
+| Intercontinental (e.g., North America to EU) | $0.05              |
+| To/from premium-tier regions                 | $0.08              |
+| To/from preview regions                      | $0.12              |
 
 Cross-region surcharges are **in addition to** the standard data processing rate. For example, sending 1 GB from us-east-1 to ap-northeast-1 (premium-tier, intercontinental) is billed at $0.02 (base) + $0.08 (premium surcharge) = $0.10/GB.
 

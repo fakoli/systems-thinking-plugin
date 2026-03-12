@@ -1,12 +1,15 @@
 # Source Ingestion Playbook
 
 ## Goal
+
 Give Claude Code enough real material to infer a better package structure before it starts scaffolding.
 
 ## Good things to add to the seed folders
 
 ### `seed/previous_designs/`
+
 Add:
+
 - prior design docs
 - old proposals
 - implementation plans
@@ -14,7 +17,9 @@ Add:
 - decision records
 
 ### `seed/vendor_docs/`
+
 Add:
+
 - exported docs
 - copied markdown notes from vendor pages
 - pricing notes
@@ -22,14 +27,18 @@ Add:
 - quota references
 
 ### `seed/reference_prompts/`
+
 Add:
+
 - prompts that worked well before
 - examples of how you frame constraints
 - examples of how you frame anti-patterns
 - notes on how you ask for plans before execution
 
 ### `seed/examples/`
+
 Add:
+
 - sample output you liked
 - examples of good decision briefs
 - examples of risk summaries

@@ -27,13 +27,13 @@ Do **not** use Decision Brief when:
 
 ## Inputs Required
 
-| Input | Required | Description |
-|---|---|---|
-| Extracted findings | Yes | Outputs from prior workflow runs: Context Packets, Complexity Heat Maps, Hidden Risk Summaries, or direct analysis results. The more structured the input, the better the brief. |
-| Ranked risks | Yes | Prioritized list of risks with severity assessments. Typically produced by complexity-mapper or architecture-risk-review. If not available, the brief will flag this gap. |
-| Assumptions | Yes | Assumptions underlying the findings — both validated and unvalidated. These become critical context for decision-makers. |
-| Decision audience | No | Who will read this brief and what decisions they are empowered to make. Shapes the level of technical detail and the framing of options. Defaults to technical leadership. |
-| Options considered | No | If multiple design or implementation options were evaluated, provide them. If not provided, the brief will present findings as applying to the current proposed approach. |
+| Input              | Required | Description                                                                                                                                                                      |
+| ------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extracted findings | Yes      | Outputs from prior workflow runs: Context Packets, Complexity Heat Maps, Hidden Risk Summaries, or direct analysis results. The more structured the input, the better the brief. |
+| Ranked risks       | Yes      | Prioritized list of risks with severity assessments. Typically produced by complexity-mapper or architecture-risk-review. If not available, the brief will flag this gap.        |
+| Assumptions        | Yes      | Assumptions underlying the findings — both validated and unvalidated. These become critical context for decision-makers.                                                         |
+| Decision audience  | No       | Who will read this brief and what decisions they are empowered to make. Shapes the level of technical detail and the framing of options. Defaults to technical leadership.       |
+| Options considered | No       | If multiple design or implementation options were evaluated, provide them. If not provided, the brief will present findings as applying to the current proposed approach.        |
 
 ## Process Steps
 
@@ -150,11 +150,11 @@ The output is a **Decision Brief** conforming to the output contract:
 
 ## Failure Modes and Caution Points
 
-| Failure Mode | Signal | Response |
-|---|---|---|
-| Insufficient extraction data | Step 1 yields fewer than 3 substantive findings or no risk assessment | Stop. Do not produce a thin brief. Recommend running `complexity-mapper` or `architecture-risk-review` first to generate adequate raw material. |
-| Single-perspective input | All findings come from one source, one extraction agent, or one analysis workflow | Flag in the brief that the evidence base is limited. Lower all confidence ratings by one level. Recommend additional analysis from a different angle. |
-| Missing cost or dependency analysis | No findings related to cost implications or system dependencies | Flag the gap explicitly in the Unresolved Questions section. Recommend running the relevant extraction (cost-capacity-analyst or architecture-dependency-mapper) before finalizing the decision. |
-| Stale findings | Input findings are based on documentation or analysis more than 30 days old | Flag recency concerns in the brief. Recommend re-running upstream analysis with current documentation before making the decision. |
-| False precision | Brief presents low-confidence findings as high-confidence, or uses precise numbers from rough estimates | Review confidence ratings in Step 3. Ensure `[Inferred]` labels are applied. Remove false precision from quantitative claims. |
-| Scope creep in synthesis | synthesis-brief-writer introduces new analysis not present in the inputs | Reject and re-invoke. The brief synthesizes; it does not analyze. New observations must be labeled `[Inferred]` at minimum, but the brief should not be the place for new investigation. |
+| Failure Mode                        | Signal                                                                                                  | Response                                                                                                                                                                                         |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Insufficient extraction data        | Step 1 yields fewer than 3 substantive findings or no risk assessment                                   | Stop. Do not produce a thin brief. Recommend running `complexity-mapper` or `architecture-risk-review` first to generate adequate raw material.                                                  |
+| Single-perspective input            | All findings come from one source, one extraction agent, or one analysis workflow                       | Flag in the brief that the evidence base is limited. Lower all confidence ratings by one level. Recommend additional analysis from a different angle.                                            |
+| Missing cost or dependency analysis | No findings related to cost implications or system dependencies                                         | Flag the gap explicitly in the Unresolved Questions section. Recommend running the relevant extraction (cost-capacity-analyst or architecture-dependency-mapper) before finalizing the decision. |
+| Stale findings                      | Input findings are based on documentation or analysis more than 30 days old                             | Flag recency concerns in the brief. Recommend re-running upstream analysis with current documentation before making the decision.                                                                |
+| False precision                     | Brief presents low-confidence findings as high-confidence, or uses precise numbers from rough estimates | Review confidence ratings in Step 3. Ensure `[Inferred]` labels are applied. Remove false precision from quantitative claims.                                                                    |
+| Scope creep in synthesis            | synthesis-brief-writer introduces new analysis not present in the inputs                                | Reject and re-invoke. The brief synthesizes; it does not analyze. New observations must be labeled `[Inferred]` at minimum, but the brief should not be the place for new investigation.         |

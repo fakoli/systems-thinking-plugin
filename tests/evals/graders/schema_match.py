@@ -78,7 +78,12 @@ def grade_markdown_structure(filepath: Path, required_headings: list[str]) -> di
             - "found_headings": List of heading strings that were found.
     """
     if not required_headings:
-        return {"pass": True, "score": 1.0, "missing_headings": [], "found_headings": []}
+        return {
+            "pass": True,
+            "score": 1.0,
+            "missing_headings": [],
+            "found_headings": [],
+        }
 
     try:
         content = filepath.read_text(encoding="utf-8")

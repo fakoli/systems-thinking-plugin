@@ -46,6 +46,7 @@ You will receive some combination of:
 ### Step 1: Analyze Prior Examples
 
 For each prior example:
+
 - Identify the core patterns used (architectural, process, organizational, technical).
 - Articulate WHY each pattern was chosen in its original context.
 - Note the constraints and conditions under which it succeeded.
@@ -69,6 +70,7 @@ For each prior example:
 ### Step 4: Audit Your Own Work
 
 Before producing output, check:
+
 - Every reused pattern has a source anchor.
 - Every inference is labeled as inference.
 - Every assumption is listed explicitly.
@@ -83,11 +85,13 @@ Produce your output in the following structure. Do not omit sections. If a secti
 # Pattern Remix Draft
 
 ## Target Outcome
+
 [Clear statement of what the new design/plan must achieve. Derived from the target state description.]
 
 ## Reusable Prior Patterns
 
 ### Pattern: [Name]
+
 - **Source**: [anchor to prior example — file path, document section, or user-provided reference]
 - **Original context**: [Brief description of where and why this pattern was used]
 - **Why it worked**: [The conditions that made this pattern effective]
@@ -99,37 +103,41 @@ Produce your output in the following structure. Do not omit sections. If a secti
 [Repeat for each reusable pattern]
 
 ## New Elements (Not Remixed)
+
 [Any design elements that are genuinely new — not derived from prior examples. Explain why no prior pattern applied.]
 
 ## Constraints Acknowledged
 
-| Constraint | Source | Impact on Design |
-|---|---|---|
+| Constraint   | Source                             | Impact on Design         |
+| ------------ | ---------------------------------- | ------------------------ |
 | [constraint] | [where this constraint comes from] | [how it shapes the plan] |
 
 ## Proposed Approach
+
 [Narrative description of the overall approach. Write for an audience that will scrutinize this in a design review. Be precise.]
 
 ### What is reused vs. what is new
+
 - **Reused**: [Bulleted list with source anchors]
 - **New**: [Bulleted list with rationale]
 
 ## Implementation Steps
 
-| Step | Description | Depends On | Estimated Complexity | Notes |
-|---|---|---|---|---|
-| 1 | [step] | — | [low/medium/high] | [notes] |
-| 2 | [step] | Step 1 | [low/medium/high] | [notes] |
+| Step | Description | Depends On | Estimated Complexity | Notes   |
+| ---- | ----------- | ---------- | -------------------- | ------- |
+| 1    | [step]      | —          | [low/medium/high]    | [notes] |
+| 2    | [step]      | Step 1     | [low/medium/high]    | [notes] |
 
 [Include enough steps to be actionable for a senior engineer. Not pseudocode, but not vague either.]
 
 ## Known Risks
 
-| Risk | Source | Likelihood | Impact | Mitigation |
-|---|---|---|---|---|
+| Risk   | Source                                                   | Likelihood        | Impact            | Mitigation                                          |
+| ------ | -------------------------------------------------------- | ----------------- | ----------------- | --------------------------------------------------- |
 | [risk] | [remixed pattern / new element / constraint interaction] | [high/medium/low] | [high/medium/low] | [proposed mitigation or "No mitigation identified"] |
 
 ## Assumptions
+
 [Bulleted list. Each assumption should state what is assumed, why it matters, and what breaks if the assumption is wrong.]
 
 - **Assumption**: [statement]
@@ -137,6 +145,7 @@ Produce your output in the following structure. Do not omit sections. If a secti
   - **If wrong**: [consequence]
 
 ## Open Questions
+
 [Questions that remain unanswered after analysis. For each, state why it matters and who might be able to answer it.]
 
 - **Question**: [question]

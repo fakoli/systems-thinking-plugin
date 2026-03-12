@@ -27,12 +27,12 @@ Do **not** use Complexity Mapper when:
 
 ## Inputs Required
 
-| Input | Required | Description |
-|---|---|---|
-| Documentation | Yes | Architecture docs, design proposals, technical specs, API references, infrastructure diagrams, or any material describing the system under analysis. |
-| Design assumptions | Yes | Stated or implied assumptions the design relies on — scaling expectations, cost models, SLA targets, team capacity. |
-| Constraints | Yes | Hard limits: budget ceilings, latency requirements, compliance mandates, vendor lock-in boundaries. |
-| Operational context | No | Current operational environment: existing infrastructure, team expertise, monitoring capabilities, incident history. Improves analysis quality significantly when provided. |
+| Input               | Required | Description                                                                                                                                                                 |
+| ------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Documentation       | Yes      | Architecture docs, design proposals, technical specs, API references, infrastructure diagrams, or any material describing the system under analysis.                        |
+| Design assumptions  | Yes      | Stated or implied assumptions the design relies on — scaling expectations, cost models, SLA targets, team capacity.                                                         |
+| Constraints         | Yes      | Hard limits: budget ceilings, latency requirements, compliance mandates, vendor lock-in boundaries.                                                                         |
+| Operational context | No       | Current operational environment: existing infrastructure, team expertise, monitoring capabilities, incident history. Improves analysis quality significantly when provided. |
 
 ## Process Steps
 
@@ -53,16 +53,19 @@ The doc-indexer output serves as the routing table for Step 2. If the doc-indexe
 Based on the doc-indexer output, route sections to three specialized extraction agents running in parallel:
 
 **Agent A — caveat-extractor**
+
 - Target: All sections containing limitations, quotas, rate limits, deprecation notices, known issues, edge cases, and traps.
 - Instruction: Extract every caveat with its source location, severity assessment, and the conditions under which it would be triggered.
 - Pay special attention to: soft limits that become hard limits at scale, features marked as "beta" or "preview," cross-service interaction caveats, and documentation that says "not recommended for production."
 
 **Agent B — cost-capacity-analyst**
+
 - Target: All sections related to pricing, resource allocation, scaling behavior, throughput limits, and capacity planning.
 - Instruction: Extract cost models, identify non-linear cost curves (costs that explode at scale), find capacity cliffs (points where adding load requires architectural changes, not just more resources), and flag any pricing that depends on usage patterns the design assumes but hasn't validated.
 - Pay special attention to: egress costs, per-request pricing at projected volumes, storage costs over time, and the gap between "free tier" assumptions and production reality.
 
 **Agent C — architecture-dependency-mapper**
+
 - Target: All sections describing system components, integrations, data flows, and external service dependencies.
 - Instruction: Map every dependency with its ownership (internal team, external vendor, open source), SLA, failure mode, and blast radius. Identify single points of failure, circular dependencies, and components where the dependency chain is deeper than two levels.
 - Pay special attention to: shared infrastructure that multiple components assume is always available, implicit ordering dependencies, and services owned by teams outside the project's control.
@@ -80,11 +83,13 @@ Gather outputs from all three extraction agents. For each output:
 Pass all three extraction outputs plus the original design assumptions and constraints to the `synthesis-brief-writer` agent with instructions to produce:
 
 **Complexity Heat Map**: A structured view of where complexity concentrates in the design, rated by:
+
 - Likelihood of causing problems (High / Medium / Low)
 - Impact if the complexity materializes (High / Medium / Low)
 - Visibility — whether current monitoring/testing would catch it before production (Visible / Hidden / Unknown)
 
 **Hidden Risk Summary**: A prioritized list of risks that are not obvious from a surface reading of the design, including:
+
 - The risk and what triggers it.
 - Evidence from the extraction outputs.
 - Which design assumptions it threatens.
@@ -151,10 +156,10 @@ The output consists of two artifacts conforming to their respective output contr
 
 ## Failure Modes and Caution Points
 
-| Failure Mode | Signal | Response |
-|---|---|---|
-| Insufficient documentation | doc-indexer identifies major structural gaps; extraction agents return thin results | Flag low confidence on the overall analysis. List specific documentation gaps as findings in their own right. Recommend the user provide additional material before treating the analysis as comprehensive. |
-| Single-source analysis | Most findings come from one document or one extraction agent | Flag in the output that findings are single-source. Confidence ratings should be lowered accordingly. Recommend cross-referencing with additional sources. |
-| Design too early-stage | Provided materials are aspirational rather than concrete; extraction agents cannot identify specific components or dependencies | Stop or downgrade the analysis. Inform the user that complexity mapping requires concrete design artifacts. Recommend returning after the design has been elaborated. |
-| Extraction agent contradiction | cost-capacity-analyst and caveat-extractor produce conflicting assessments of the same component | Surface the contradiction explicitly in the synthesis. Do not silently resolve it. Present both perspectives and recommend investigation. |
-| Scope too large for single pass | doc-indexer produces a structural map with more than 30 distinct sections or 5+ major subsystems | Recommend running `context-sharding` first to split the material, then running complexity-mapper on each shard, followed by a cross-shard synthesis pass. |
+| Failure Mode                    | Signal                                                                                                                          | Response                                                                                                                                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Insufficient documentation      | doc-indexer identifies major structural gaps; extraction agents return thin results                                             | Flag low confidence on the overall analysis. List specific documentation gaps as findings in their own right. Recommend the user provide additional material before treating the analysis as comprehensive. |
+| Single-source analysis          | Most findings come from one document or one extraction agent                                                                    | Flag in the output that findings are single-source. Confidence ratings should be lowered accordingly. Recommend cross-referencing with additional sources.                                                  |
+| Design too early-stage          | Provided materials are aspirational rather than concrete; extraction agents cannot identify specific components or dependencies | Stop or downgrade the analysis. Inform the user that complexity mapping requires concrete design artifacts. Recommend returning after the design has been elaborated.                                       |
+| Extraction agent contradiction  | cost-capacity-analyst and caveat-extractor produce conflicting assessments of the same component                                | Surface the contradiction explicitly in the synthesis. Do not silently resolve it. Present both perspectives and recommend investigation.                                                                   |
+| Scope too large for single pass | doc-indexer produces a structural map with more than 30 distinct sections or 5+ major subsystems                                | Recommend running `context-sharding` first to split the material, then running complexity-mapper on each shard, followed by a cross-shard synthesis pass.                                                   |

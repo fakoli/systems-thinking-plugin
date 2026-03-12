@@ -2,7 +2,6 @@
 
 import pytest
 
-
 EXPECTED_AGENTS = [
     "doc-indexer.md",
     "doc-reader.md",
@@ -93,20 +92,14 @@ def test_reference_subdirs_exist(plugin_root, subdir):
 
 @pytest.mark.parametrize("filename", EXPECTED_AGENTS)
 def test_expected_agent_files_exist(agents_dir, filename):
-    assert (agents_dir / filename).is_file(), (
-        f"Agent file {filename} is missing"
-    )
+    assert (agents_dir / filename).is_file(), f"Agent file {filename} is missing"
 
 
 @pytest.mark.parametrize("filename", EXPECTED_SKILLS)
 def test_expected_skill_files_exist(skills_dir, filename):
-    assert (skills_dir / filename).is_file(), (
-        f"Skill file {filename} is missing"
-    )
+    assert (skills_dir / filename).is_file(), f"Skill file {filename} is missing"
 
 
 @pytest.mark.parametrize("filename", EXPECTED_DOCS)
 def test_docs_files_exist(plugin_root, filename):
-    assert (plugin_root / "docs" / filename).is_file(), (
-        f"docs/{filename} is missing"
-    )
+    assert (plugin_root / "docs" / filename).is_file(), f"docs/{filename} is missing"

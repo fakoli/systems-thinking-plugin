@@ -31,6 +31,16 @@ Adapt prior proven work to a new problem. Feed in a known-good design and a set 
 - `/decision-brief` — Package findings into a stakeholder-ready Decision Brief with evidence, risks, and next steps.
 - `/architecture-risk-review` — Targeted review of failure modes, hidden dependencies, and operational burden.
 
+## Setup
+
+```bash
+git clone https://github.com/fakoli/systems-thinking-plugin.git
+cd systems-thinking-plugin
+./setup.sh
+```
+
+The setup script checks for `uv`, `python3`, `tmux` (optional), and `claude` CLI (optional), then syncs dependencies and runs validation. If `uv` is not installed, it will offer to install it for you.
+
 ## Quick start
 
 ### 1. Populate your reference material
@@ -50,18 +60,21 @@ The more relevant material you provide, the better the extraction agents perform
 ### 2. Invoke a skill
 
 For a vendor risk scan:
+
 ```
 /complexity-mapper
 Scan reference/vendor_docs/vendor-x/ for hidden risks, quota limits, and operational constraints.
 ```
 
 For a repo orientation:
+
 ```
 /context-sharding
 Orient me to this repo. Map the major modules, flag complexity areas, and tell me what to inspect first.
 ```
 
 For reusing a prior design:
+
 ```
 /pattern-remix
 Prior work: reference/previous_designs/hub-spoke-v2/
@@ -93,14 +106,28 @@ systems-thinking-plugin/
 │   │   ├── decision-brief.md
 │   │   └── architecture-risk-review.md
 │   └── settings.json        # Hooks configuration
+├── utils/                   # Orchestration and pre-processing scripts
+│   ├── orchestrate.py               # Spawn parallel Claude CLI workers
+│   ├── tmux_runner.py               # Manage workers in tmux panes
+│   ├── build_prompt.py              # Assemble agent prompts from definitions
+│   ├── index_doc.py                 # Parse document structure (no LLM)
+│   ├── slice_sections.py            # Split docs into sections (no LLM)
+│   ├── scan_patterns.py             # Regex pattern scanner (no LLM)
+│   ├── estimate_tokens.py           # Token counting and shard planning
+│   ├── aggregate.py                 # Merge findings from workers
+│   └── validate_output.py           # Validate against output contracts
 ├── specs/                   # Design specifications (00-11 numbered files)
 ├── reference/               # Your source material goes here
 ├── docs/                    # Reference documentation
 │   ├── output-contracts.md          # The 5 output format definitions
 │   ├── agent-design-principles.md   # How agents are designed and why
-│   └── repo-conventions.md          # Naming, structure, and style rules
+│   ├── repo-conventions.md          # Naming, structure, and style rules
+│   └── context-orchestration-design.md # Orchestration architecture
+├── tests/                   # 182 tests (unit, contract, eval)
 ├── examples/
 │   └── usage-scenarios.md           # 4 worked examples with agent flows
+├── setup.sh                 # One-command setup (checks uv, syncs deps)
+├── pyproject.toml           # Project config (uv/Python)
 ├── CLAUDE.md                # Project instructions for Claude Code
 ├── COMPATIBILITY_NOTES.md   # Notes on Cursor and other platforms
 └── README.md

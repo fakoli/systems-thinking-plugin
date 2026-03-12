@@ -57,6 +57,7 @@ Use this when the goal is to surface risks that are not obvious from a surface r
 # Hidden Risk Summary
 
 ## Scope Reviewed
+
 [What sources and extraction outputs were synthesized. List each upstream agent output with its scope.]
 
 - **Source**: [agent name] — [what it covered] — [source anchor]
@@ -64,6 +65,7 @@ Use this when the goal is to surface risks that are not obvious from a surface r
 ## Top Hidden Risks
 
 ### Risk 1: [Name]
+
 - **Severity**: [critical / high / medium / low]
 - **Category**: [technical / organizational / financial / compliance / operational]
 - **Evidence**: [from source] [What the extraction agents found that points to this risk. Include source anchors.]
@@ -72,19 +74,23 @@ Use this when the goal is to surface risks that are not obvious from a surface r
 - **Why it's hidden**: [What makes this risk non-obvious — buried in fine print, emergent from combining multiple findings, contradicted by surface-level messaging, etc.]
 
 ### Risk 2: [Name]
+
 [Same structure. Repeat for all identified risks, ranked by likely impact descending.]
 
 ## Assumptions
+
 - **Assumption**: [statement]
   - **Depends on**: [what evidence or conditions support this]
   - **If wrong**: [which risks change and how]
 
 ## Unresolved Questions
+
 - **Question**: [question]
   - **Why it matters**: [what decisions or risk assessments depend on the answer]
   - **Suggested next step**: [who to ask or what to investigate]
 
 ## What We Still Don't Know
+
 [Explicit enumeration of gaps. For each gap, state what kind of evidence would fill it and whether the gap affects any of the risks above.]
 
 - [Gap description] — **Affects**: [which risks or conclusions] — **To resolve**: [action]
@@ -100,13 +106,14 @@ Use this when the goal is to give decision-makers a quick visual-style overview 
 # Complexity Heat Map
 
 ## Scope
+
 [What was analyzed and from which upstream agent outputs.]
 
 ## Heat Map
 
-| Area | Why It Matters | Severity | Confidence | Key Evidence | Source Anchors |
-|---|---|---|---|---|---|
-| [area name] | [why complexity here is consequential] | high/medium/low | high/medium/low | [from source] [brief evidence summary] | [anchors] |
+| Area        | Why It Matters                         | Severity        | Confidence      | Key Evidence                           | Source Anchors |
+| ----------- | -------------------------------------- | --------------- | --------------- | -------------------------------------- | -------------- |
+| [area name] | [why complexity here is consequential] | high/medium/low | high/medium/low | [from source] [brief evidence summary] | [anchors]      |
 
 ### Detailed Breakdown
 
@@ -124,12 +131,15 @@ Use this when the goal is to give decision-makers a quick visual-style overview 
 [Repeat for each area.]
 
 ## Confidence Notes
+
 [For any area where confidence is medium or low, explain what would raise confidence and what evidence is missing.]
 
 ## Assumptions
+
 - [assumption] — **If wrong**: [consequence]
 
 ## What We Still Don't Know
+
 - [Gap] — **Affects**: [which heat map entries] — **To resolve**: [action]
 ```
 
@@ -143,31 +153,38 @@ Use this when someone needs to make a specific decision and wants the evidence o
 # Decision Brief
 
 ## Decision Under Review
+
 [Precise statement of the decision to be made. Not the background — the actual decision point.]
 
 ## Options Considered
 
 ### Option A: [Name]
+
 - **Summary**: [what this option entails]
 - **Evidence for**: [from source] [supporting evidence with source anchors]
 - **Evidence against**: [from source] [contrary evidence with source anchors]
 - **Inferred concerns**: [inferred] [your analysis of risks or issues not directly stated in evidence]
 
 ### Option B: [Name]
+
 [Same structure. Include all options, even ones that seem weak — the decision-maker should see why they were considered and rejected.]
 
 ## Evidence Summary
 
 ### What the evidence clearly supports
+
 [Findings that are well-attested across multiple sources or extraction outputs. Source anchors required.]
 
 ### What the evidence is ambiguous about
+
 [Findings where extraction agents produced conflicting or incomplete information. State the conflict precisely.]
 
 ### What the evidence does not address
+
 [Questions relevant to the decision that no extraction agent output covers.]
 
 ## Inferred Concerns
+
 [inferred] [Your analytical layer. Clearly separated from evidence. Each concern should state what evidence it is based on and what leap of reasoning you are making.]
 
 - **Concern**: [statement]
@@ -177,21 +194,24 @@ Use this when someone needs to make a specific decision and wants the evidence o
 
 ## Top Risks
 
-| Risk | Applies To | Impact | Likelihood | Evidence Basis | Source Anchors |
-|---|---|---|---|---|---|
-| [risk] | [which option(s)] | high/medium/low | high/medium/low | [from source] or [inferred] | [anchors] |
+| Risk   | Applies To        | Impact          | Likelihood      | Evidence Basis              | Source Anchors |
+| ------ | ----------------- | --------------- | --------------- | --------------------------- | -------------- |
+| [risk] | [which option(s)] | high/medium/low | high/medium/low | [from source] or [inferred] | [anchors]      |
 
 ## Recommended Next Checks
+
 [Actions to take before making the decision. These are not recommendations for which option to choose — they are recommendations for what information to gather.]
 
 - [ ] [Check description] — **Purpose**: [what it would clarify] — **Urgency**: [high/medium/low]
 
 ## Unresolved Questions
+
 - **Question**: [question]
   - **Relevant to**: [which options or risks]
   - **Impact if unanswered**: [what happens if the decision is made without this answer]
 
 ## What We Still Don't Know
+
 - [Gap] — **Decision impact**: [how this gap affects the choice between options] — **To resolve**: [action]
 ```
 

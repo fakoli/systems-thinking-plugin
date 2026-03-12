@@ -27,13 +27,13 @@ Do **not** use Architecture Risk Review when:
 
 ## Inputs Required
 
-| Input | Required | Description |
-|---|---|---|
-| Design artifacts | Yes | Architecture diagrams, system design documents, infrastructure-as-code, service definitions, API contracts, data flow diagrams. The more concrete the artifacts, the more specific the risk assessment. |
-| Architecture docs | Yes | Technical documentation describing the system: component responsibilities, communication patterns, data storage strategy, deployment model, scaling approach. |
-| Caveats | No | Known limitations, quotas, or constraints already identified. If provided, the review will validate and extend them rather than rediscover them. |
-| Dependency maps | No | Pre-existing dependency maps or service catalogs. If not provided, the review will construct them from the design artifacts. |
-| Operational context | No | Current operational reality: incident history, monitoring coverage, on-call structure, deployment frequency, rollback capabilities. Significantly improves risk severity calibration. |
+| Input               | Required | Description                                                                                                                                                                                             |
+| ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Design artifacts    | Yes      | Architecture diagrams, system design documents, infrastructure-as-code, service definitions, API contracts, data flow diagrams. The more concrete the artifacts, the more specific the risk assessment. |
+| Architecture docs   | Yes      | Technical documentation describing the system: component responsibilities, communication patterns, data storage strategy, deployment model, scaling approach.                                           |
+| Caveats             | No       | Known limitations, quotas, or constraints already identified. If provided, the review will validate and extend them rather than rediscover them.                                                        |
+| Dependency maps     | No       | Pre-existing dependency maps or service catalogs. If not provided, the review will construct them from the design artifacts.                                                                            |
+| Operational context | No       | Current operational reality: incident history, monitoring coverage, on-call structure, deployment frequency, rollback capabilities. Significantly improves risk severity calibration.                   |
 
 ## Process Steps
 
@@ -68,6 +68,7 @@ Run the `caveat-extractor` agent on sections identified by the doc-indexer as ar
 - **Failure propagation paths**: How a failure in one component cascades. Look for missing circuit breakers, unbounded retry loops, synchronous chains without timeouts, shared failure domains.
 
 For each caveat extracted, require:
+
 - The specific limit or risk.
 - The source in the documentation.
 - The conditions under which it becomes a problem.
@@ -180,11 +181,11 @@ The output is a **Hidden Risk Summary with architectural focus** conforming to t
 
 ## Failure Modes and Caution Points
 
-| Failure Mode | Signal | Response |
-|---|---|---|
-| Architecture documentation incomplete | doc-indexer identifies multiple undocumented components or integrations; caveat-extractor returns sparse results for key components | Proceed with available information but prominently flag documentation gaps in the output. List undocumented areas as risks in their own right. Recommend documentation remediation as a high-priority action. |
-| Design too abstract for concrete risk identification | Artifacts describe high-level intent ("microservices architecture with event-driven communication") without specifying technologies, configurations, or failure handling | Downgrade the review to a risk questionnaire: list the questions that must be answered before a concrete risk assessment is possible. Present these as the primary output rather than producing a speculative risk inventory. |
-| Missing operational context | No incident history, monitoring coverage, or on-call information provided | Proceed but lower confidence on detectability assessments. Note in every detectability field that the assessment is based on architectural inference, not operational data. Recommend providing operational context for a higher-fidelity review. |
-| Single architecture perspective | All documentation comes from one team or one role (e.g., only the development team, no ops or security perspective) | Flag the limited perspective in the executive summary. Recommend soliciting input from operations, security, and any teams that own upstream or downstream dependencies. |
-| Review surface too large | Architecture spans more than 15 distinct services or components | Recommend scoping the review to a specific subsystem or failure domain. Alternatively, run `context-sharding` to split the architecture into reviewable segments, then run architecture-risk-review on each segment with a final cross-segment synthesis. |
-| Known caveats provided but outdated | User provides caveats that reference deprecated configurations or resolved issues | Validate provided caveats against current documentation. Flag any that appear outdated. Do not carry stale caveats into the risk summary without verification. |
+| Failure Mode                                         | Signal                                                                                                                                                                   | Response                                                                                                                                                                                                                                                  |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture documentation incomplete                | doc-indexer identifies multiple undocumented components or integrations; caveat-extractor returns sparse results for key components                                      | Proceed with available information but prominently flag documentation gaps in the output. List undocumented areas as risks in their own right. Recommend documentation remediation as a high-priority action.                                             |
+| Design too abstract for concrete risk identification | Artifacts describe high-level intent ("microservices architecture with event-driven communication") without specifying technologies, configurations, or failure handling | Downgrade the review to a risk questionnaire: list the questions that must be answered before a concrete risk assessment is possible. Present these as the primary output rather than producing a speculative risk inventory.                             |
+| Missing operational context                          | No incident history, monitoring coverage, or on-call information provided                                                                                                | Proceed but lower confidence on detectability assessments. Note in every detectability field that the assessment is based on architectural inference, not operational data. Recommend providing operational context for a higher-fidelity review.         |
+| Single architecture perspective                      | All documentation comes from one team or one role (e.g., only the development team, no ops or security perspective)                                                      | Flag the limited perspective in the executive summary. Recommend soliciting input from operations, security, and any teams that own upstream or downstream dependencies.                                                                                  |
+| Review surface too large                             | Architecture spans more than 15 distinct services or components                                                                                                          | Recommend scoping the review to a specific subsystem or failure domain. Alternatively, run `context-sharding` to split the architecture into reviewable segments, then run architecture-risk-review on each segment with a final cross-segment synthesis. |
+| Known caveats provided but outdated                  | User provides caveats that reference deprecated configurations or resolved issues                                                                                        | Validate provided caveats against current documentation. Flag any that appear outdated. Do not carry stale caveats into the risk summary without verification.                                                                                            |

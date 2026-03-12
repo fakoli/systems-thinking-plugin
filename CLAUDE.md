@@ -10,30 +10,35 @@ A Claude Code plugin for senior infrastructure and network engineers. It surface
 ## Core Workflows
 
 ### 1. Pattern Remix
+
 Use prior proven work, target-state goals, and constraints to generate high-quality first drafts and execution plans for new but related problems.
 
 ### 2. Complexity Mapper
+
 Surface hidden complexity, side effects, risks, dependencies, and likely project blow-up points by analyzing documentation, costs, capacity, and operational constraints.
 
 ### 3. Context Sharding
+
 Split large input across parallel subagents so narrower agents can extract structure, summaries, caveats, and signals before a primary agent synthesizes them.
 
 ## Architecture
 
 ### Subagents (`.claude/agents/`)
+
 Seven v1 subagents with narrow, auditable roles:
 
-| Agent | Role | Type |
-|-------|------|------|
-| `pattern-remix-planner` | Convert prior examples + constraints into draft plans | Synthesis |
-| `doc-indexer` | Map document structure, flag high-value sections | Extraction |
-| `doc-reader` | Extract technical claims, limits, dependencies | Extraction |
-| `caveat-extractor` | Find limitations, quotas, buried traps | Extraction |
-| `cost-capacity-analyst` | Highlight cost mechanics, scaling constraints | Extraction |
-| `architecture-dependency-mapper` | Map control/data-plane dependencies | Extraction |
-| `synthesis-brief-writer` | Turn extracted evidence into decision briefs | Synthesis |
+| Agent                            | Role                                                  | Type       |
+| -------------------------------- | ----------------------------------------------------- | ---------- |
+| `pattern-remix-planner`          | Convert prior examples + constraints into draft plans | Synthesis  |
+| `doc-indexer`                    | Map document structure, flag high-value sections      | Extraction |
+| `doc-reader`                     | Extract technical claims, limits, dependencies        | Extraction |
+| `caveat-extractor`               | Find limitations, quotas, buried traps                | Extraction |
+| `cost-capacity-analyst`          | Highlight cost mechanics, scaling constraints         | Extraction |
+| `architecture-dependency-mapper` | Map control/data-plane dependencies                   | Extraction |
+| `synthesis-brief-writer`         | Turn extracted evidence into decision briefs          | Synthesis  |
 
 ### Skills (`.claude/skills/` or `skills/`)
+
 Five reusable Markdown playbooks:
 
 - `pattern-remix.md` — generate first drafts from prior work
@@ -43,7 +48,9 @@ Five reusable Markdown playbooks:
 - `architecture-risk-review.md` — targeted review of failure modes and dependencies
 
 ### Hooks
+
 Minimal in v1. Only include if straightforward and robust:
+
 - **Pre-flight reminder:** Reinforce extraction/synthesis separation before complex workflows
 - **Completion quality check:** Verify outputs include assumptions, risks, unresolved questions, next steps
 
@@ -59,12 +66,14 @@ If hooks feel brittle, stub or document them instead.
 6. **Optimize for senior engineering judgment.** Help evaluate implementation burden, hidden risk, decision quality.
 
 ### Extraction Agent Rules
+
 - Extract, do not over-interpret
 - Preserve nuance, return caveats and counterexamples
 - Include unknowns
 - Avoid final recommendations unless explicitly asked
 
 ### Synthesis Agent Rules
+
 - Distinguish evidence from inference
 - Call out assumptions explicitly
 - Include unresolved questions
@@ -76,18 +85,23 @@ If hooks feel brittle, stub or document them instead.
 All deliverables must follow these structures:
 
 ### Hidden Risk Summary
+
 `scope reviewed` · `top hidden risks` · `likely impact areas` · `assumptions` · `unresolved questions` · `source anchors`
 
 ### Complexity Heat Map
+
 `complexity area` · `why it matters` · `severity` · `confidence` · `source anchors`
 
 ### Decision Brief
+
 `decision under review` · `options considered` · `evidence summary` · `inferred concerns` · `top risks` · `recommended next checks` · `unresolved questions`
 
 ### Pattern Remix Draft
+
 `target outcome` · `reusable prior patterns` · `constraints` · `proposed approach` · `implementation steps` · `known risks`
 
 ### Context Packet
+
 `source name` · `section/scope reviewed` · `extracted findings` · `caveats` · `confidence/ambiguity notes` · `source anchors`
 
 ## Conventions
@@ -104,12 +118,12 @@ All deliverables must follow these structures:
 
 An active reference library of material that informs agent behavior and grounds outputs in real prior work:
 
-| Folder | Contents |
-|--------|----------|
+| Folder              | Contents                                               |
+| ------------------- | ------------------------------------------------------ |
 | `previous_designs/` | Prior design docs, proposals, architecture notes, ADRs |
-| `vendor_docs/` | Vendor documentation, pricing, quotas, limitations |
-| `prompts/` | Effective prompts and patterns that worked before |
-| `examples/` | Example outputs showing desired behavior |
+| `vendor_docs/`      | Vendor documentation, pricing, quotas, limitations     |
+| `prompts/`          | Effective prompts and patterns that worked before      |
+| `examples/`         | Example outputs showing desired behavior               |
 
 ## Build Phases
 

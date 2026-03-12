@@ -4,13 +4,15 @@
 
 ```bash
 cd systems-thinking-plugin
-pip install -r tests/requirements.txt
+
+# First time setup (installs uv if needed, syncs deps, runs validation)
+./setup.sh
 
 # Fast tests — no API key needed
-pytest tests/unit tests/contracts
+uv run pytest tests/unit tests/contracts
 
 # Eval tests — requires claude CLI and ANTHROPIC_API_KEY
-pytest tests/evals -m eval
+uv run pytest tests/evals -m eval
 ```
 
 ## Test Layers
@@ -58,11 +60,11 @@ context:
         File content provided as context.
   working_directory: optional/subdir
 expected:
-  grader: contains          # which grader to use
+  grader: contains # which grader to use
   criteria:
-    - "expected substring"  # grader-specific criteria
+    - "expected substring" # grader-specific criteria
     - "another expected output"
-timeout: 120                # seconds, optional (default: 300)
+timeout: 120 # seconds, optional (default: 300)
 tags:
   - eval
   - optional-additional-tag
@@ -70,27 +72,27 @@ tags:
 
 ### Field Reference
 
-| Field | Required | Description |
-|---|---|---|
-| `name` | yes | Unique identifier for the case |
-| `description` | yes | Human-readable summary |
-| `prompt` | yes | Input sent to Claude CLI |
-| `context.files` | no | Virtual files available during the run |
-| `context.working_directory` | no | CWD override for the CLI invocation |
-| `expected.grader` | yes | Grading strategy to apply |
-| `expected.criteria` | yes | Grader-specific pass/fail criteria |
-| `timeout` | no | Max seconds before the case is marked failed |
-| `tags` | no | Pytest markers applied to the case |
+| Field                       | Required | Description                                  |
+| --------------------------- | -------- | -------------------------------------------- |
+| `name`                      | yes      | Unique identifier for the case               |
+| `description`               | yes      | Human-readable summary                       |
+| `prompt`                    | yes      | Input sent to Claude CLI                     |
+| `context.files`             | no       | Virtual files available during the run       |
+| `context.working_directory` | no       | CWD override for the CLI invocation          |
+| `expected.grader`           | yes      | Grading strategy to apply                    |
+| `expected.criteria`         | yes      | Grader-specific pass/fail criteria           |
+| `timeout`                   | no       | Max seconds before the case is marked failed |
+| `tags`                      | no       | Pytest markers applied to the case           |
 
 ## Graders
 
-| Grader | Behavior | Criteria Format |
-|---|---|---|
-| `contains` | Output must contain all listed substrings | List of strings |
-| `regex` | Output must match all listed patterns | List of regex patterns |
-| `json_schema` | Output must validate against a JSON schema | JSON schema object |
-| `llm_judge` | A second LLM call grades the output | `{prompt: "...", passing_score: 0.8}` |
-| `custom` | Runs a Python function you provide | `{module: "...", function: "..."}` |
+| Grader        | Behavior                                   | Criteria Format                       |
+| ------------- | ------------------------------------------ | ------------------------------------- |
+| `contains`    | Output must contain all listed substrings  | List of strings                       |
+| `regex`       | Output must match all listed patterns      | List of regex patterns                |
+| `json_schema` | Output must validate against a JSON schema | JSON schema object                    |
+| `llm_judge`   | A second LLM call grades the output        | `{prompt: "...", passing_score: 0.8}` |
+| `custom`      | Runs a Python function you provide         | `{module: "...", function: "..."}`    |
 
 To add a new grader, implement a function with signature `(output: str, criteria: Any) -> GradeResult` in `tests/evals/graders/` and register it in the grader registry.
 
@@ -98,11 +100,11 @@ To add a new grader, implement a function with signature `(output: str, criteria
 
 Three GitHub Actions jobs run on this repo:
 
-| Job | Trigger | What it does |
-|---|---|---|
-| `unit-and-contract` | Every push to `main`, every PR | Runs unit + contract tests. Must pass. |
-| `evals` | PR with `run-evals` label, nightly at 2am UTC | Runs eval suite after unit/contract pass. Nightly failures warn but do not block. PR failures block merge. |
-| `validate-plugin-structure` | Every push to `main`, every PR | Checks `settings.json` validity, frontmatter in agent/skill files, file length warnings. |
+| Job                         | Trigger                                       | What it does                                                                                               |
+| --------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `unit-and-contract`         | Every push to `main`, every PR                | Runs unit + contract tests. Must pass.                                                                     |
+| `evals`                     | PR with `run-evals` label, nightly at 2am UTC | Runs eval suite after unit/contract pass. Nightly failures warn but do not block. PR failures block merge. |
+| `validate-plugin-structure` | Every push to `main`, every PR                | Checks `settings.json` validity, frontmatter in agent/skill files, file length warnings.                   |
 
 Evals only run after unit and contract tests pass (dependency chain). To trigger evals on a PR, add the `run-evals` label.
 

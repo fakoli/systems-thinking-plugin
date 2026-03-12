@@ -6,7 +6,6 @@ import pytest
 
 from tests.conftest import PLUGIN_ROOT, parse_frontmatter
 
-
 SKILLS_DIR = PLUGIN_ROOT / ".claude" / "skills"
 
 SKILL_FILES = [
@@ -39,9 +38,7 @@ def _read_body(filename):
 @pytest.mark.parametrize("filename", SKILL_FILES)
 def test_skills_have_when_to_use(filename):
     body = _read_body(filename).lower()
-    assert "when to use" in body or "## when" in body, (
-        f"{filename} missing 'When to Use' section"
-    )
+    assert "when to use" in body or "## when" in body, f"{filename} missing 'When to Use' section"
 
 
 # ── Inputs section ───────────────────────────────────────────────────────────
@@ -61,9 +58,7 @@ def test_skills_have_process_steps(filename):
     """Skills should describe their process as numbered steps or a Process section."""
     body = _read_body(filename)
     has_numbered_steps = bool(re.search(r"^\s*\d+\.\s", body, re.MULTILINE))
-    has_process_heading = bool(
-        re.search(r"^#{2,3}\s+(Process|Steps)", body, re.MULTILINE)
-    )
+    has_process_heading = bool(re.search(r"^#{2,3}\s+(Process|Steps)", body, re.MULTILINE))
     assert has_numbered_steps or has_process_heading, (
         f"{filename} missing numbered steps or ## Process/Steps section"
     )
@@ -76,9 +71,7 @@ def test_skills_have_process_steps(filename):
 def test_skills_have_output_format(filename):
     """Skills should specify their output format or reference an output contract."""
     body = _read_body(filename).lower()
-    assert "output" in body, (
-        f"{filename} does not mention output format or output contract"
-    )
+    assert "output" in body, f"{filename} does not mention output format or output contract"
 
 
 # ── Failure modes ────────────────────────────────────────────────────────────
@@ -90,9 +83,7 @@ def test_skills_have_failure_modes(filename):
     body = _read_body(filename).lower()
     keywords = ["failure", "caution", "warning"]
     found = [kw for kw in keywords if kw in body]
-    assert found, (
-        f"{filename} should mention at least one of: {keywords}"
-    )
+    assert found, f"{filename} should mention at least one of: {keywords}"
 
 
 # ── Agent references ────────────────────────────────────────────────────────

@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -25,10 +24,13 @@ from typing import Any
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from graders.file_exists import grade_files_exist
-from graders.section_check import grade_sections
-from graders.forbidden_check import grade_no_forbidden_files, grade_no_forbidden_patterns
 from graders.composite import grade_composite
+from graders.file_exists import grade_files_exist
+from graders.forbidden_check import (
+    grade_no_forbidden_files,
+    grade_no_forbidden_patterns,
+)
+from graders.section_check import grade_sections
 
 HARNESS_DIR = Path(__file__).resolve().parent
 CASES_DIR = HARNESS_DIR / "cases"
@@ -182,7 +184,11 @@ def _run_single_grader(outcome: dict, workdir: Path, expected: bool) -> dict:
         filepath = _resolve_file(outcome["file"], workdir)
         return grade_no_forbidden_patterns(filepath, outcome["patterns"])
 
-    return {"pass": False, "score": 0.0, "error": f"Unknown outcome type: {outcome_type}"}
+    return {
+        "pass": False,
+        "score": 0.0,
+        "error": f"Unknown outcome type: {outcome_type}",
+    }
 
 
 def _resolve_file(file_ref: str, workdir: Path) -> Path:

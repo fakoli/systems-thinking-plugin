@@ -4,7 +4,6 @@ import pytest
 
 from tests.conftest import PLUGIN_ROOT
 
-
 CONTRACTS_PATH = PLUGIN_ROOT / "docs" / "output-contracts.md"
 
 
@@ -89,9 +88,7 @@ CONTRACT_FIELDS = {
     CONTRACT_FIELDS.items(),
     ids=CONTRACT_FIELDS.keys(),
 )
-def test_each_contract_has_required_sections(
-    contracts_text, contract_name, expected_fields
-):
+def test_each_contract_has_required_sections(contracts_text, contract_name, expected_fields):
     """Each contract should mention its expected field keywords."""
     # Find the section for this contract (case-insensitive)
     text_lower = contracts_text.lower()
@@ -101,9 +98,5 @@ def test_each_contract_has_required_sections(
     # Look at the text from the contract heading onward
     section_text = text_lower[contract_start:]
 
-    missing = [
-        field for field in expected_fields if field not in section_text
-    ]
-    assert not missing, (
-        f"Contract '{contract_name}' is missing mentions of: {missing}"
-    )
+    missing = [field for field in expected_fields if field not in section_text]
+    assert not missing, f"Contract '{contract_name}' is missing mentions of: {missing}"

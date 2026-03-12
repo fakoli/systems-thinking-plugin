@@ -27,11 +27,11 @@ Do **not** use Context Sharding when:
 
 ## Inputs Required
 
-| Input | Required | Description |
-|---|---|---|
-| Source material | Yes | Large document sets, multiple documents, big codebases, or any collection of material that needs extraction. Provide file paths, URLs, or inline content. |
-| Extraction goal | Yes | What information needs to be extracted. This drives the sharding strategy and the instructions given to each doc-reader instance. |
-| Downstream workflow | No | If the sharded output will feed into another skill (complexity-mapper, decision-brief, etc.), specify it so the extraction can be shaped to match expected inputs. |
+| Input               | Required | Description                                                                                                                                                        |
+| ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Source material     | Yes      | Large document sets, multiple documents, big codebases, or any collection of material that needs extraction. Provide file paths, URLs, or inline content.          |
+| Extraction goal     | Yes      | What information needs to be extracted. This drives the sharding strategy and the instructions given to each doc-reader instance.                                  |
+| Downstream workflow | No       | If the sharded output will feed into another skill (complexity-mapper, decision-brief, etc.), specify it so the extraction can be shaped to match expected inputs. |
 
 ## Process Steps
 
@@ -119,12 +119,14 @@ If critical cross-references were lost in sharding, run a targeted cross-referen
 Depending on the workflow:
 
 **If presenting directly to the user**: Deliver all Context Packets with a summary that includes:
+
 - How the material was sharded and why.
 - Key findings per shard.
 - Cross-shard themes or contradictions.
 - Gaps identified.
 
 **If feeding into a downstream workflow**: Package the Context Packets in the format expected by the target skill:
+
 - `complexity-mapper`: Pass as documentation input along with design assumptions.
 - `decision-brief`: Pass as extracted findings input.
 - `architecture-risk-review`: Pass as architecture docs input.
@@ -184,11 +186,11 @@ The output is a set of **Context Packets**, one per shard, conforming to the out
 
 ## Failure Modes and Caution Points
 
-| Failure Mode | Signal | Response |
-|---|---|---|
-| Documents too interrelated to shard cleanly | doc-indexer shows dense cross-reference graph; most documents reference most other documents | Use larger shards with intentional overlap at boundaries. Add a mandatory cross-reference pass after extraction. Accept higher processing cost for better coherence. |
-| Individual shards still too large | A single shard exceeds single-pass processing capacity | Re-shard: split the oversized shard into sub-shards. Apply the same sharding strategy recursively. Update the sharding plan. |
-| Critical cross-references lost in sharding | Step 5 reveals important links between shards that neither shard's Context Packet captured | Run a targeted cross-reference pass. A single agent reads the boundary material from both shards and produces a Cross-Reference Addendum. |
-| Shard failure | One or more doc-reader instances fail to produce output | Do not proceed with incomplete data. Investigate the failure (material too dense, format issues, access problems), fix, and re-run the failed shard. |
-| Unbalanced shards | One shard produces vastly more extracted items than others | Review the sharding plan. The large shard may need splitting, or the small shards may be too granular and should be merged. Rebalance for the next run. |
-| Over-sharding | Material is split into so many shards that the synthesis step cannot hold all Context Packets in context | Reduce shard count. Merge related shards. As a rule of thumb, keep shard count under 8 for a single synthesis pass. |
+| Failure Mode                                | Signal                                                                                                   | Response                                                                                                                                                             |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Documents too interrelated to shard cleanly | doc-indexer shows dense cross-reference graph; most documents reference most other documents             | Use larger shards with intentional overlap at boundaries. Add a mandatory cross-reference pass after extraction. Accept higher processing cost for better coherence. |
+| Individual shards still too large           | A single shard exceeds single-pass processing capacity                                                   | Re-shard: split the oversized shard into sub-shards. Apply the same sharding strategy recursively. Update the sharding plan.                                         |
+| Critical cross-references lost in sharding  | Step 5 reveals important links between shards that neither shard's Context Packet captured               | Run a targeted cross-reference pass. A single agent reads the boundary material from both shards and produces a Cross-Reference Addendum.                            |
+| Shard failure                               | One or more doc-reader instances fail to produce output                                                  | Do not proceed with incomplete data. Investigate the failure (material too dense, format issues, access problems), fix, and re-run the failed shard.                 |
+| Unbalanced shards                           | One shard produces vastly more extracted items than others                                               | Review the sharding plan. The large shard may need splitting, or the small shards may be too granular and should be merged. Rebalance for the next run.              |
+| Over-sharding                               | Material is split into so many shards that the synthesis step cannot hold all Context Packets in context | Reduce shard count. Merge related shards. As a rule of thumb, keep shard count under 8 for a single synthesis pass.                                                  |

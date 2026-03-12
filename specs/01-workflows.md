@@ -3,6 +3,7 @@
 ## 1. Pattern Remix
 
 ### Definition
+
 Use prior proven work, target-state goals, and explicit constraints to generate high-quality first drafts and execution plans for new but related problems.
 
 ### Best use cases
@@ -30,6 +31,7 @@ Use prior proven work, target-state goals, and explicit constraints to generate 
 ## 2. Complexity Mapper
 
 ### Definition
+
 Gather documentation, architecture assumptions, cost and capacity constraints, operational considerations, and implementation caveats to surface hidden complexity, side effects, risks, dependencies, and likely project blow-up points.
 
 ### Best use cases
@@ -60,6 +62,7 @@ Gather documentation, architecture assumptions, cost and capacity constraints, o
 ## 3. Context Sharding
 
 ### Definition
+
 Split large bodies of input across smaller parallel subagents so narrower agents can extract structure, summaries, caveats, constraints, and signals before a primary reasoning agent synthesizes them.
 
 ### Best use cases
