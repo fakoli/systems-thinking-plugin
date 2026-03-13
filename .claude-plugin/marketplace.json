@@ -1,0 +1,36 @@
+{
+  "name": "systems-thinking",
+  "owner": {
+    "name": "Sekou Doumbouya",
+    "email": "sdoumbouya81@gmail.com"
+  },
+  "metadata": {
+    "description": "Systems thinking tools for infrastructure and network architecture decision workflows",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "systems-thinking-plugin",
+      "source": "./",
+      "description": "Surface hidden complexity, reuse proven design patterns, and produce decision-ready artifacts for infrastructure and network architecture workflows.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Sekou Doumbouya",
+        "email": "sdoumbouya81@gmail.com"
+      },
+      "homepage": "https://github.com/fakoli/systems-thinking-plugin",
+      "repository": "https://github.com/fakoli/systems-thinking-plugin",
+      "license": "MIT",
+      "keywords": [
+        "infrastructure",
+        "architecture",
+        "complexity",
+        "risk-analysis",
+        "decision-support",
+        "vendor-evaluation",
+        "network-engineering"
+      ],
+      "category": "analysis"
+    }
+  ]
+}
