@@ -1,4 +1,4 @@
-"""Tests for hook prompts defined in .claude/settings.json."""
+"""Tests for hook prompts defined in hooks/hooks.json."""
 
 import json
 

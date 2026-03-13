@@ -90,22 +90,24 @@ All outputs follow structured contracts (see `docs/output-contracts.md`). Every 
 
 ```
 systems-thinking-plugin/
-├── .claude/
-│   ├── agents/              # Subagent definitions
-│   │   ├── doc-indexer.md           # Scan and map document structure
-│   │   ├── doc-reader.md           # Extract technical claims and limits
-│   │   ├── caveat-extractor.md     # Find buried limitations and traps
-│   │   ├── cost-capacity-analyst.md # Surface cost and scaling issues
-│   │   ├── architecture-dependency-mapper.md # Map dependencies
-│   │   ├── pattern-remix-planner.md # Adapt prior work to new problems
-│   │   └── synthesis-brief-writer.md # Turn evidence into decision briefs
-│   ├── skills/              # Workflow playbooks
-│   │   ├── pattern-remix.md
-│   │   ├── complexity-mapper.md
-│   │   ├── context-sharding.md
-│   │   ├── decision-brief.md
-│   │   └── architecture-risk-review.md
-│   └── settings.json        # Hooks configuration
+├── .claude-plugin/
+│   └── plugin.json          # Plugin manifest (name, version, author)
+├── agents/                  # Subagent definitions
+│   ├── doc-indexer.md               # Scan and map document structure
+│   ├── doc-reader.md               # Extract technical claims and limits
+│   ├── caveat-extractor.md         # Find buried limitations and traps
+│   ├── cost-capacity-analyst.md    # Surface cost and scaling issues
+│   ├── architecture-dependency-mapper.md # Map dependencies
+│   ├── pattern-remix-planner.md    # Adapt prior work to new problems
+│   └── synthesis-brief-writer.md   # Turn evidence into decision briefs
+├── skills/                  # Workflow playbooks (marketplace format)
+│   ├── pattern-remix/SKILL.md
+│   ├── complexity-mapper/SKILL.md
+│   ├── context-sharding/SKILL.md
+│   ├── decision-brief/SKILL.md
+│   └── architecture-risk-review/SKILL.md
+├── hooks/
+│   └── hooks.json           # Event hooks (session start, pre-flight, quality check)
 ├── utils/                   # Orchestration and pre-processing scripts
 │   ├── orchestrate.py               # Spawn parallel Claude CLI workers
 │   ├── tmux_runner.py               # Manage workers in tmux panes

@@ -1,5 +1,7 @@
 """Tests that the expected plugin directory structure exists."""
 
+import json
+
 import pytest
 
 EXPECTED_AGENTS = [
@@ -12,12 +14,12 @@ EXPECTED_AGENTS = [
     "synthesis-brief-writer.md",
 ]
 
-EXPECTED_SKILLS = [
-    "pattern-remix.md",
-    "complexity-mapper.md",
-    "context-sharding.md",
-    "decision-brief.md",
-    "architecture-risk-review.md",
+EXPECTED_SKILL_DIRS = [
+    "pattern-remix",
+    "complexity-mapper",
+    "context-sharding",
+    "decision-brief",
+    "architecture-risk-review",
 ]
 
 EXPECTED_DOCS = [
@@ -34,11 +36,23 @@ EXPECTED_REFERENCE_SUBDIRS = [
 ]
 
 
+# ── Marketplace structure ──────────────────────────────────────────────────
+
+
+def test_plugin_manifest_exists(plugin_root):
+    manifest = plugin_root / ".claude-plugin" / "plugin.json"
+    assert manifest.is_file(), ".claude-plugin/plugin.json is missing"
+
+
+def test_plugin_manifest_is_valid_json(plugin_root):
+    manifest = plugin_root / ".claude-plugin" / "plugin.json"
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    assert "name" in data, "plugin.json missing 'name'"
+    assert "description" in data, "plugin.json missing 'description'"
+    assert "version" in data, "plugin.json missing 'version'"
+
+
 # ── Top-level directories ───────────────────────────────────────────────────
-
-
-def test_claude_dir_exists(plugin_root):
-    assert (plugin_root / ".claude").is_dir()
 
 
 def test_agents_dir_exists(agents_dir):
@@ -49,7 +63,11 @@ def test_skills_dir_exists(skills_dir):
     assert skills_dir.is_dir()
 
 
-def test_settings_json_exists(settings_path):
+def test_hooks_dir_exists(plugin_root):
+    assert (plugin_root / "hooks").is_dir()
+
+
+def test_hooks_json_exists(settings_path):
     assert settings_path.is_file()
 
 
@@ -95,9 +113,10 @@ def test_expected_agent_files_exist(agents_dir, filename):
     assert (agents_dir / filename).is_file(), f"Agent file {filename} is missing"
 
 
-@pytest.mark.parametrize("filename", EXPECTED_SKILLS)
-def test_expected_skill_files_exist(skills_dir, filename):
-    assert (skills_dir / filename).is_file(), f"Skill file {filename} is missing"
+@pytest.mark.parametrize("skill_dir", EXPECTED_SKILL_DIRS)
+def test_expected_skill_dirs_exist(skills_dir, skill_dir):
+    skill_file = skills_dir / skill_dir / "SKILL.md"
+    assert skill_file.is_file(), f"Skill file skills/{skill_dir}/SKILL.md is missing"
 
 
 @pytest.mark.parametrize("filename", EXPECTED_DOCS)

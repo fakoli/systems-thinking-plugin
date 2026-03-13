@@ -6,7 +6,7 @@ import pytest
 
 from tests.conftest import PLUGIN_ROOT, parse_frontmatter
 
-AGENTS_DIR = PLUGIN_ROOT / ".claude" / "agents"
+AGENTS_DIR = PLUGIN_ROOT / "agents"
 
 EXTRACTION_AGENTS = [
     "doc-indexer.md",

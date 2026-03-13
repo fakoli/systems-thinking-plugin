@@ -23,7 +23,7 @@ Split large input across parallel subagents so narrower agents can extract struc
 
 ## Architecture
 
-### Subagents (`.claude/agents/`)
+### Subagents (`agents/`)
 
 Seven v1 subagents with narrow, auditable roles:
 
@@ -37,15 +37,15 @@ Seven v1 subagents with narrow, auditable roles:
 | `architecture-dependency-mapper` | Map control/data-plane dependencies                   | Extraction |
 | `synthesis-brief-writer`         | Turn extracted evidence into decision briefs          | Synthesis  |
 
-### Skills (`.claude/skills/` or `skills/`)
+### Skills (`skills/`)
 
-Five reusable Markdown playbooks:
+Five reusable Markdown playbooks (each in `skills/<name>/SKILL.md`):
 
-- `pattern-remix.md` — generate first drafts from prior work
-- `complexity-mapper.md` — uncover hidden operational/cost/implementation complexity
-- `context-sharding.md` — break large source material into digestible packets
-- `decision-brief.md` — package findings for stakeholders
-- `architecture-risk-review.md` — targeted review of failure modes and dependencies
+- `pattern-remix` — generate first drafts from prior work
+- `complexity-mapper` — uncover hidden operational/cost/implementation complexity
+- `context-sharding` — break large source material into digestible packets
+- `decision-brief` — package findings for stakeholders
+- `architecture-risk-review` — targeted review of failure modes and dependencies
 
 ### Hooks
 
@@ -132,9 +132,17 @@ An active reference library of material that informs agent behavior and grounds 
 - **Phase 2:** Scaffold — create folders, write subagents, skills, hooks, config
 - **Phase 3:** Refine — tighten prompts, improve consistency, add usage examples
 
+## Plugin Manifest
+
+The plugin uses the marketplace format:
+
+- `.claude-plugin/plugin.json` — manifest with name, description, version, author
+- `agents/` — subagent Markdown definitions
+- `skills/<name>/SKILL.md` — skill playbooks
+- `hooks/hooks.json` — event hooks (SessionStart, UserPromptSubmit, Stop)
+
 ## Non-Goals (v1)
 
-- Marketplace-ready packaging
 - Deep Cursor-specific work
 - Polished UI or dashboards
 - Generalized enterprise workflow engine

@@ -1,0 +1,19 @@
+{
+  "name": "systems-thinking-plugin",
+  "description": "Surface hidden complexity, reuse proven design patterns, and produce decision-ready artifacts for infrastructure and network architecture workflows.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Sekou Doumbouya"
+  },
+  "repository": "https://github.com/fakoli/systems-thinking-plugin",
+  "license": "MIT",
+  "keywords": [
+    "infrastructure",
+    "architecture",
+    "complexity",
+    "risk-analysis",
+    "decision-support",
+    "vendor-evaluation",
+    "network-engineering"
+  ]
+}

@@ -36,17 +36,17 @@ def plugin_root() -> Path:
 
 @pytest.fixture
 def agents_dir() -> Path:
-    return PLUGIN_ROOT / ".claude" / "agents"
+    return PLUGIN_ROOT / "agents"
 
 
 @pytest.fixture
 def skills_dir() -> Path:
-    return PLUGIN_ROOT / ".claude" / "skills"
+    return PLUGIN_ROOT / "skills"
 
 
 @pytest.fixture
 def settings_path() -> Path:
-    return PLUGIN_ROOT / ".claude" / "settings.json"
+    return PLUGIN_ROOT / "hooks" / "hooks.json"
 
 
 @pytest.fixture
@@ -56,4 +56,4 @@ def all_agent_files(agents_dir: Path) -> list[Path]:
 
 @pytest.fixture
 def all_skill_files(skills_dir: Path) -> list[Path]:
-    return sorted(skills_dir.glob("*.md"))
+    return sorted(skills_dir.glob("*/SKILL.md"))
