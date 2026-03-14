@@ -43,7 +43,7 @@ Start with **context-sharding** to break down the vendor documentation, then run
 /complexity-mapper
 
 Evaluate the following cloud connectivity options for our multi-cloud environment.
-Sources are in .seed/vendor_docs/ and .seed/previous_designs/.
+Sources are in reference/vendor_docs/ and reference/previous_designs/.
 Constraints: must support BGP, budget ceiling is $X/month, ops team is 2 people.
 ```
 
@@ -87,7 +87,7 @@ A vendor's pitch deck and technical documentation look clean, but the team suspe
 ```
 /complexity-mapper
 
-Scan the vendor documentation in .seed/vendor_docs/vendor-x/ for hidden risks.
+Scan the vendor documentation in reference/vendor_docs/vendor-x/ for hidden risks.
 Focus on: quotas, regional limitations, support requirements, pricing at scale.
 We are evaluating this vendor for production network connectivity.
 ```
@@ -106,7 +106,7 @@ There is a known-good prior implementation (e.g., a hub-spoke network design, a 
 
 ### What happens under the hood
 
-1. **doc-reader** extracts the structure, decisions, constraints, and implementation details from the prior design artifacts in `.seed/previous_designs/`.
+1. **doc-reader** extracts the structure, decisions, constraints, and implementation details from the prior design artifacts in `reference/previous_designs/`.
 
 2. **pattern-remix-planner** (a synthesis agent) receives:
    - The extraction results from the prior design
@@ -130,7 +130,7 @@ There is a known-good prior implementation (e.g., a hub-spoke network design, a 
 ```
 /pattern-remix
 
-Prior work: .seed/previous_designs/hub-spoke-aws-gcp/
+Prior work: reference/previous_designs/hub-spoke-aws-gcp/
 Target: Extend the hub-spoke model to include Azure with a shared transit layer.
 Constraints: Azure does not support our current BGP community tagging scheme.
 Avoid: Do not replicate the manual failover process from the original design.
@@ -193,4 +193,4 @@ Start with the top-level structure and go one level deep into each major directo
 - These scenarios can be combined. A vendor evaluation might start with context-sharding, move to complexity-mapper, and finish with decision-brief.
 - The skills are designed to be invoked individually. You do not need to run the full chain every time.
 - If the source material is small enough to fit in a single context window, you can skip context-sharding and go directly to the relevant analysis skill.
-- Always populate `.seed/` with your source material before invoking skills. The agents read from those directories.
+- Always populate `reference/` with your source material before invoking skills. The agents read from those directories.

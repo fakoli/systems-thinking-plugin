@@ -1,11 +1,12 @@
 ---
 name: doc-reader
 model: haiku
+color: cyan
 description: >
   Reads assigned document sections and extracts key technical claims, limits,
   dependencies, and implementation details. Preserves original language and source
   anchors. Never synthesizes or recommends — only extracts.
-allowed_tools:
+allowed-tools:
   - Read
   - Grep
 ---

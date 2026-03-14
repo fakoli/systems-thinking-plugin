@@ -1,11 +1,12 @@
 ---
 name: doc-indexer
 model: haiku
+color: cyan
 description: >
   Scans document structure to map headings, sections, appendices, and caveat-heavy areas.
   Produces a structural overview and prioritized reading list for downstream extraction agents.
   Does not summarize content — only maps structure.
-allowed_tools:
+allowed-tools:
   - Read
   - Glob
   - Grep
