@@ -114,9 +114,9 @@ def test_hook_prompts_are_concise(hooks):
 
 
 def test_no_bash_hooks(hooks):
-    """v1 should use prompt-only hooks, no bash hooks."""
+    """v1 should not define any bash hooks."""
     for hook_type, entries in hooks.items():
         for i, hook in enumerate(_flatten_hooks(entries)):
             assert hook.get("type") != "bash", (
-                f"{hook_type}[{i}] has type 'bash'; only 'prompt' allowed in v1"
+                f"{hook_type}[{i}] has type 'bash'; bash hooks are not allowed in v1"
             )
