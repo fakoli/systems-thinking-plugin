@@ -1,5 +1,6 @@
 ---
 name: architecture-dependency-mapper
+model: sonnet
 description: >
   Maps control-plane, data-plane, routing, ownership, and operational dependencies
   that affect delivery risk. Identifies single points of failure, blast radius concerns,

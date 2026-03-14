@@ -1,5 +1,6 @@
 ---
 name: synthesis-brief-writer
+model: opus
 description: >
   Turns extracted evidence from upstream extraction agents into clear, decision-ready
   briefs. Supports multiple output formats: Hidden Risk Summary, Complexity Heat Map,

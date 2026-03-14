@@ -1,5 +1,6 @@
 ---
 name: caveat-extractor
+model: sonnet
 description: >
   Hunts for limitations, quotas, exclusions, side effects, warning notes, and buried
   implementation traps in documents and extracted notes. Classifies each caveat by

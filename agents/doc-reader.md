@@ -1,5 +1,6 @@
 ---
 name: doc-reader
+model: haiku
 description: >
   Reads assigned document sections and extracts key technical claims, limits,
   dependencies, and implementation details. Preserves original language and source

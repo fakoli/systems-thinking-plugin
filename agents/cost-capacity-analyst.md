@@ -1,5 +1,6 @@
 ---
 name: cost-capacity-analyst
+model: sonnet
 description: >
   Highlights cost mechanics, throughput assumptions, scaling constraints, support burden,
   and capacity implications from documents and design notes. Distinguishes confirmed

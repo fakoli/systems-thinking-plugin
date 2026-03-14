@@ -1,37 +1,8 @@
 # systems-thinking-plugin
 
-A Claude Code plugin that helps senior infrastructure and network engineers surface hidden complexity, reuse proven design patterns, and produce decision-ready artifacts from large or messy source material. Everything is local, file-based, and auditable.
+A Claude Code plugin for senior infrastructure and network engineers. Surface hidden complexity, reuse proven design patterns, and produce decision-ready artifacts — all local and file-based.
 
-## Who this is for
-
-Engineers who do architecture reviews, vendor evaluations, connectivity design, migration planning, or any work where the real risks hide in the details. The plugin is most useful when you have too much source material for a single clean reasoning pass, or when you need structured outputs that hold up in design reviews and stakeholder conversations.
-
-## Core workflows
-
-### 1. Context Sharding
-
-Break large input (big repos, multi-document vendor packages, sprawling architecture notes) into focused chunks. Extraction agents process each chunk independently and produce Context Packets with findings, caveats, and source anchors. This prevents the common failure mode where early impressions bias how later material is read.
-
-**Invoke with:** `/context-sharding`
-
-### 2. Complexity Mapper
-
-Take extracted findings and surface hidden implementation complexity, operational burden, cost traps, and architectural risks that are not obvious from a surface reading. Produces a Complexity Heat Map (ranked areas of difficulty) and a Hidden Risk Summary (non-obvious risks with impact assessment).
-
-**Invoke with:** `/complexity-mapper`
-
-### 3. Pattern Remix
-
-Adapt prior proven work to a new problem. Feed in a known-good design and a set of new constraints, and get back a draft plan that identifies what transfers, what needs adaptation, and what risks the adaptation introduces.
-
-**Invoke with:** `/pattern-remix`
-
-### Supporting skills
-
-- `/decision-brief` — Package findings into a stakeholder-ready Decision Brief with evidence, risks, and next steps.
-- `/architecture-risk-review` — Targeted review of failure modes, hidden dependencies, and operational burden.
-
-## Setup
+## Install
 
 ```bash
 git clone https://github.com/fakoli/systems-thinking-plugin.git
@@ -39,120 +10,98 @@ cd systems-thinking-plugin
 ./setup.sh
 ```
 
-The setup script checks for `uv`, `python3`, `tmux` (optional), and `claude` CLI (optional), then syncs dependencies and runs validation. If `uv` is not installed, it will offer to install it for you.
+The setup script checks for `uv`, `python3`, `tmux` (optional), and the `claude` CLI (optional), then syncs dependencies and runs validation.
 
-## Quick start
+## Workflows
 
-### 1. Populate your reference material
+The plugin provides five slash-command skills, each orchestrating a set of focused subagents.
 
-Drop source documents into the `reference/` subdirectories:
+### `/complexity-mapper`
 
-```
-reference/
-├── previous_designs/    # Prior design docs, ADRs, architecture notes
-├── vendor_docs/         # Vendor PDFs, pricing sheets, technical guides
-├── prompts/             # Prompts and patterns that have worked before
-└── examples/            # Example outputs showing the quality bar you want
-```
+Surface hidden implementation complexity, cost traps, and architectural risks. Runs extraction agents (caveat-extractor, cost-capacity-analyst, architecture-dependency-mapper) in parallel, then synthesizes findings into a **Complexity Heat Map** and **Hidden Risk Summary**.
 
-The more relevant material you provide, the better the extraction agents perform. Even one good prior design or one vendor doc is enough to start.
+### `/context-sharding`
 
-### 2. Invoke a skill
+Break large or varied source material (vendor packages, sprawling repos, multi-document specs) into focused chunks. Extraction agents process each chunk independently, producing **Context Packets** with findings, caveats, and source anchors. Prevents early-impression bias from a single-pass read.
 
-For a vendor risk scan:
+### `/pattern-remix`
 
-```
-/complexity-mapper
-Scan reference/vendor_docs/vendor-x/ for hidden risks, quota limits, and operational constraints.
-```
+Adapt prior proven work to a new problem. Provide a known-good design and a set of new constraints to get a **Pattern Remix Draft** identifying what transfers, what needs adaptation, and what risks the adaptation introduces.
 
-For a repo orientation:
+### `/decision-brief`
 
-```
-/context-sharding
-Orient me to this repo. Map the major modules, flag complexity areas, and tell me what to inspect first.
-```
+Package extracted findings into a stakeholder-ready **Decision Brief** with evidence, options, risks, and next steps.
 
-For reusing a prior design:
+### `/architecture-risk-review`
 
-```
-/pattern-remix
-Prior work: reference/previous_designs/hub-spoke-v2/
-Target: Extend to a third cloud provider.
-Constraints: No BGP community support on the new provider.
-```
+Targeted review of failure modes, hidden dependencies, and operational burden for a specific architecture. Produces a **Hidden Risk Summary** with architectural focus.
 
-### 3. Review the output
+## Agents
 
-All outputs follow structured contracts (see `docs/output-contracts.md`). Every finding includes source anchors so you can verify claims against the original material. Assumptions and unresolved questions are called out explicitly.
+Seven subagents with narrow, auditable roles. Each agent has a designated model tier to balance speed and quality:
 
-## Directory structure
+| Agent | Role | Model |
+|-------|------|-------|
+| `doc-indexer` | Map document structure, flag high-value sections | Haiku |
+| `doc-reader` | Extract technical claims, limits, dependencies | Haiku |
+| `caveat-extractor` | Find buried limitations, quotas, traps | Sonnet |
+| `cost-capacity-analyst` | Surface cost mechanics, scaling constraints | Sonnet |
+| `architecture-dependency-mapper` | Map control/data-plane dependencies | Sonnet |
+| `pattern-remix-planner` | Adapt prior work to new problems | Opus |
+| `synthesis-brief-writer` | Turn extracted evidence into decision briefs | Opus |
 
-```
-systems-thinking-plugin/
-├── .claude-plugin/
-│   └── plugin.json          # Plugin manifest (name, version, author)
-├── agents/                  # Subagent definitions
-│   ├── doc-indexer.md               # Scan and map document structure
-│   ├── doc-reader.md               # Extract technical claims and limits
-│   ├── caveat-extractor.md         # Find buried limitations and traps
-│   ├── cost-capacity-analyst.md    # Surface cost and scaling issues
-│   ├── architecture-dependency-mapper.md # Map dependencies
-│   ├── pattern-remix-planner.md    # Adapt prior work to new problems
-│   └── synthesis-brief-writer.md   # Turn evidence into decision briefs
-├── skills/                  # Workflow playbooks (marketplace format)
-│   ├── pattern-remix/SKILL.md
-│   ├── complexity-mapper/SKILL.md
-│   ├── context-sharding/SKILL.md
-│   ├── decision-brief/SKILL.md
-│   └── architecture-risk-review/SKILL.md
-├── hooks/
-│   └── hooks.json           # Event hooks (session start, pre-flight, quality check)
-├── utils/                   # Orchestration and pre-processing scripts
-│   ├── orchestrate.py               # Spawn parallel Claude CLI workers
-│   ├── tmux_runner.py               # Manage workers in tmux panes
-│   ├── build_prompt.py              # Assemble agent prompts from definitions
-│   ├── index_doc.py                 # Parse document structure (no LLM)
-│   ├── slice_sections.py            # Split docs into sections (no LLM)
-│   ├── scan_patterns.py             # Regex pattern scanner (no LLM)
-│   ├── estimate_tokens.py           # Token counting and shard planning
-│   ├── aggregate.py                 # Merge findings from workers
-│   └── validate_output.py           # Validate against output contracts
-├── specs/                   # Design specifications (00-11 numbered files)
-├── reference/               # Your source material goes here
-├── docs/                    # Reference documentation
-│   ├── output-contracts.md          # The 5 output format definitions
-│   ├── agent-design-principles.md   # How agents are designed and why
-│   ├── repo-conventions.md          # Naming, structure, and style rules
-│   └── context-orchestration-design.md # Orchestration architecture
-├── tests/                   # 182 tests (unit, contract, eval)
-├── examples/
-│   └── usage-scenarios.md           # 4 worked examples with agent flows
-├── setup.sh                 # One-command setup (checks uv, syncs deps)
-├── pyproject.toml           # Project config (uv/Python)
-├── CLAUDE.md                # Project instructions for Claude Code
-├── COMPATIBILITY_NOTES.md   # Notes on Cursor and other platforms
-└── README.md
+Extraction agents (Haiku/Sonnet) run fast and in parallel. Synthesis agents (Opus) run last and produce the final outputs.
+
+## Reference material
+
+Drop source documents into `reference/` subdirectories to give the agents real material to work with:
+
+| Directory | Contents |
+|-----------|----------|
+| `previous_designs/` | Prior design docs, ADRs, architecture notes |
+| `vendor_docs/` | Vendor documentation, pricing, quotas, SLAs |
+| `prompts/` | Prompts and patterns that have worked before |
+| `examples/` | Example outputs showing the quality bar you want |
+
+Even one vendor doc or one prior design is enough to start.
+
+## Output contracts
+
+All outputs follow structured formats defined in `docs/output-contracts.md`:
+
+- **Hidden Risk Summary** — scope, top risks, impact areas, assumptions, unresolved questions
+- **Complexity Heat Map** — complexity areas ranked by severity and confidence
+- **Decision Brief** — decision frame, options, evidence, risks, next steps
+- **Pattern Remix Draft** — reusable patterns, adaptations, constraints, known risks
+- **Context Packet** — extracted findings with caveats and source anchors
+
+Every finding includes source anchors so you can verify claims against the original material.
+
+## Testing
+
+**CI (automated):** Unit and contract tests run on every push and PR.
+
+```bash
+uv run pytest tests/unit tests/contracts -v
 ```
 
-## How to populate reference/ for better results
+**Evals (manual, local only):** Eval tests invoke the Claude CLI and require it on your PATH. These are not run in CI — run them locally when validating agent behavior.
 
-The agents work best when they have real source material to extract from. Here is what to put in each directory:
+```bash
+# Run all evals
+uv run pytest tests/evals -v -m eval --timeout=300
 
-**`reference/previous_designs/`** — Drop in design documents, architecture decision records, implementation plans, or Terraform module structures from prior work you want to reuse or reference. The pattern-remix workflow reads from here.
+# Run a single eval
+uv run pytest tests/evals -v -k complexity_mapper
 
-**`reference/vendor_docs/`** — Vendor technical documentation, pricing pages, SLA descriptions, quota tables, API references. The complexity-mapper and context-sharding workflows read from here when doing vendor evaluations.
-
-**`reference/prompts/`** — Prompts, prompt chains, or instruction sets that have produced good results in the past. These help calibrate agent behavior to your preferred style and depth.
-
-**`reference/examples/`** — Example outputs showing the quality bar and format you expect. If you have a particularly good decision brief or risk summary from prior work, drop it here.
-
-You do not need all four directories populated to start. One vendor doc or one prior design is enough for a useful run.
+# Dry-run (validate case files without executing)
+python tests/evals/harness.py --dry-run
+```
 
 ## Further reading
 
-- `docs/output-contracts.md` — Detailed definitions of the 5 output formats
-- `docs/agent-design-principles.md` — Why agents are designed the way they are
-- `docs/repo-conventions.md` — Naming, structure, and contribution conventions
-- `examples/usage-scenarios.md` — 4 detailed usage scenarios with agent flows
-- `COMPATIBILITY_NOTES.md` — Notes on Cursor compatibility and platform differences
+- `docs/output-contracts.md` — Output format definitions
+- `docs/agent-design-principles.md` — Agent design rationale
+- `docs/repo-conventions.md` — Naming and structure conventions
+- `examples/usage-scenarios.md` — Worked examples with agent flows
+- `COMPATIBILITY_NOTES.md` — Cursor compatibility notes

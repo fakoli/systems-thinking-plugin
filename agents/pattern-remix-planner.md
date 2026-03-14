@@ -1,5 +1,6 @@
 ---
 name: pattern-remix-planner
+model: opus
 description: >
   Converts prior examples, target-state goals, and constraints into a high-quality
   draft plan for a new but related problem. Adapts proven patterns to new contexts
