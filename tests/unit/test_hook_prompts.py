@@ -126,24 +126,24 @@ def test_completion_prompt_mentions_unresolved(completion_hook):
 # ── Quality constraints ──────────────────────────────────────────────────────
 
 
-def _flatten_hooks(entries):
+def _flatten_hooks(entries, hook_type="<unknown>"):
     """Yield individual hook dicts from the required nested wrapper format."""
     for idx, entry in enumerate(entries):
-        assert isinstance(entry, dict), f"Entry {idx} must be a dict"
-        assert "hooks" in entry, f"Entry {idx} must contain a 'hooks' list"
+        assert isinstance(entry, dict), f"{hook_type}[{idx}] must be a dict"
+        assert "hooks" in entry, f"{hook_type}[{idx}] must contain a 'hooks' list"
         inner = entry["hooks"]
         assert isinstance(inner, list) and inner, (
-            f"Entry {idx} 'hooks' must be a non-empty list"
+            f"{hook_type}[{idx}] 'hooks' must be a non-empty list"
         )
         for j, hook in enumerate(inner):
-            assert isinstance(hook, dict), f"Entry {idx}.hooks[{j}] must be a dict"
+            assert isinstance(hook, dict), f"{hook_type}[{idx}].hooks[{j}] must be a dict"
             yield hook
 
 
 def test_hook_prompts_are_concise(hooks):
     """Each hook prompt should be under 500 characters to stay focused."""
     for hook_type, entries in hooks.items():
-        for i, hook in enumerate(_flatten_hooks(entries)):
+        for i, hook in enumerate(_flatten_hooks(entries, hook_type)):
             if "prompt" in hook:
                 length = len(hook["prompt"])
                 assert length < 500, f"{hook_type}[{i}] prompt is {length} chars (max 500)"
@@ -152,7 +152,7 @@ def test_hook_prompts_are_concise(hooks):
 def test_no_bash_hooks(hooks):
     """v1 should not define any bash hooks."""
     for hook_type, entries in hooks.items():
-        for i, hook in enumerate(_flatten_hooks(entries)):
+        for i, hook in enumerate(_flatten_hooks(entries, hook_type)):
             assert hook.get("type") != "bash", (
                 f"{hook_type}[{i}] has type 'bash'; bash hooks are not allowed in v1"
             )
