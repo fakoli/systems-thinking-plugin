@@ -4,6 +4,8 @@ This document defines the design principles, behavioral rules, and interaction m
 
 Every agent definition (in `.claude/agents/`) should be written with these principles in mind. When in doubt, err toward narrower scope, more explicit caveats, and preserving source anchors over producing a cleaner-looking output.
 
+For the systems thinking concepts behind these principles, see `docs/systems-thinking-foundations.md`.
+
 ---
 
 ## Core Principles
@@ -14,13 +16,13 @@ Extraction agents gather facts, caveats, structure, limits, and references from 
 
 Synthesis agents take the output of extraction agents and connect findings into decision-ready artifacts. They do not read raw source material directly when extraction agents are available.
 
-This separation exists because combining reading and reasoning in a single pass increases the risk of confirmation bias, premature simplification, and lost nuance. Keeping them separate makes each step auditable.
+This separation exists because combining reading and reasoning in a single pass increases the risk of confirmation bias, premature simplification, and lost nuance. Keeping them separate makes each step auditable. In systems thinking terms, this is the distinction between reductionist analysis (decomposing into parts) and holistic synthesis (reassembling into a coherent whole).
 
 ### 2. Keep roles narrow
 
 Each subagent has one primary job and clear boundaries. A doc-reader reads and extracts. A caveat-extractor finds buried limitations. A synthesis-brief-writer turns extracted evidence into a decision brief.
 
-Narrow roles make it easier to debug bad outputs. When a finding is wrong, you can trace it to a specific agent rather than guessing which part of a monolithic prompt caused the problem.
+Narrow roles make it easier to debug bad outputs. When a finding is wrong, you can trace it to a specific agent rather than guessing which part of a monolithic prompt caused the problem. Narrow roles enforce clean system boundaries — each agent's scope is explicit, preventing the scope creep that obscures where failures originate.
 
 ### 3. Preserve source anchors
 
@@ -30,7 +32,7 @@ Every finding, claim, or extracted fact should reference the file, section, page
 - They let synthesis agents weigh evidence by source quality.
 - They make the output defensible in design reviews and stakeholder conversations.
 
-If a finding cannot be anchored to a specific source, it must be explicitly marked as "inferred" or "unanchored."
+If a finding cannot be anchored to a specific source, it must be explicitly marked as "inferred" or "unanchored." Source anchoring counteracts bounded rationality — it prevents the drift from "what the evidence says" to "what we remember the evidence saying."
 
 ### 4. Prefer structured outputs
 
@@ -47,6 +49,8 @@ Agents must call out ambiguity, missing data, and low-confidence inferences rath
 - If data is missing, say so rather than filling in a plausible guess.
 - Use explicit confidence markers (high / medium / low) when rating severity or likelihood.
 
+This implements the systems thinking practice of surfacing mental models explicitly rather than letting unstated assumptions drive conclusions.
+
 ### 6. Optimize for senior engineering judgment
 
 The target user is a senior infrastructure or network engineer who needs to evaluate implementation burden, hidden risk, and decision quality. Outputs should be calibrated for that audience:
@@ -55,6 +59,8 @@ The target user is a senior infrastructure or network engineer who needs to eval
 - Surface non-obvious findings rather than restating what is already in the source.
 - Flag operational and implementation concerns that a junior engineer might miss.
 - Present tradeoffs, not just recommendations.
+
+Systems thinking's goal is not to replace judgment but to improve the information that judgment operates on — surfacing leverage points and hidden dynamics that change the decision landscape.
 
 ---
 

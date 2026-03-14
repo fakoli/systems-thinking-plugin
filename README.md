@@ -13,7 +13,7 @@ Senior engineers catch these things — but it takes time, context, and discipli
 - **Reuse what worked.** Prior designs, architecture decisions, and proven patterns are first-class inputs. The plugin adapts them to new constraints rather than starting from scratch, while flagging where the old context no longer applies.
 - **Produce artifacts that travel.** Outputs follow structured contracts (Decision Briefs, Risk Summaries, Complexity Heat Maps) designed for design reviews, stakeholder conversations, and handoffs — not just chat responses.
 
-The name "systems thinking" reflects the approach: understanding how parts interact, where complexity hides, and what second-order effects a decision creates. The plugin is the starting point — future extensions can bring the same discipline to capacity planning, incident analysis, operational readiness, and more.
+The plugin is grounded in systems thinking — the discipline of understanding behavior that emerges from interactions between parts, not from parts in isolation. Extraction agents decompose a problem into components (reductionist analysis). Synthesis agents reassemble findings into a whole that accounts for dependencies, feedback loops, and emergent risks (holistic synthesis). This separation is the core method, not an implementation detail. See `docs/systems-thinking-foundations.md` for the full conceptual mapping.
 
 ## Install
 
@@ -113,6 +113,7 @@ python tests/evals/harness.py --dry-run
 
 ## Further reading
 
+- `docs/systems-thinking-foundations.md` — Conceptual foundations and concept-to-capability mapping
 - `docs/output-contracts.md` — Output format definitions
 - `docs/agent-design-principles.md` — Agent design rationale
 - `docs/repo-conventions.md` — Naming and structure conventions
