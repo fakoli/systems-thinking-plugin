@@ -5,14 +5,14 @@
     "email": "sdoumbouya81@gmail.com"
   },
   "metadata": {
-    "description": "Systems thinking tools for infrastructure and network architecture decision workflows",
+    "description": "Apply systems thinking to infrastructure and architecture decisions — extract hidden risks, map dependencies, reuse proven patterns, and produce structured decision-ready artifacts.",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "systems-thinking-plugin",
       "source": "./",
-      "description": "Surface hidden complexity, reuse proven design patterns, and produce decision-ready artifacts for infrastructure and network architecture workflows.",
+      "description": "Apply systems thinking to infrastructure and architecture decisions. Extract hidden risks from vendor docs, map architectural dependencies, reuse proven design patterns, and produce structured decision-ready artifacts — all grounded in source evidence.",
       "version": "0.1.0",
       "author": {
         "name": "Sekou Doumbouya",

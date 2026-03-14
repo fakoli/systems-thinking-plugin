@@ -1,6 +1,19 @@
 # systems-thinking-plugin
 
-A Claude Code plugin for senior infrastructure and network engineers. Surface hidden complexity, reuse proven design patterns, and produce decision-ready artifacts — all local and file-based.
+A Claude Code plugin that applies systems thinking to infrastructure and architecture decisions — surfacing what gets missed when teams evaluate vendors, plan migrations, or design new systems.
+
+## Why this exists
+
+Most architecture failures don't come from choosing the wrong technology. They come from buried caveats in vendor docs nobody fully read, cost mechanics that only surface at scale, dependencies between systems that nobody mapped, and prior lessons that didn't transfer to the new project.
+
+Senior engineers catch these things — but it takes time, context, and discipline. This plugin encodes that discipline into reusable workflows:
+
+- **Extract before you synthesize.** Separate the work of gathering facts from the work of drawing conclusions. Extraction agents pull out every technical claim, limitation, cost mechanic, and dependency — faithfully, with source anchors. Synthesis agents connect those findings into decisions only after extraction is complete.
+- **Preserve what you find.** Every finding traces back to a specific file, section, or page. No hallucinated certainty. No collapsed nuance. When a caveat says "supported in us-east-1 only," that's what gets reported — not "broadly available."
+- **Reuse what worked.** Prior designs, architecture decisions, and proven patterns are first-class inputs. The plugin adapts them to new constraints rather than starting from scratch, while flagging where the old context no longer applies.
+- **Produce artifacts that travel.** Outputs follow structured contracts (Decision Briefs, Risk Summaries, Complexity Heat Maps) designed for design reviews, stakeholder conversations, and handoffs — not just chat responses.
+
+The name "systems thinking" reflects the approach: understanding how parts interact, where complexity hides, and what second-order effects a decision creates. The plugin is the starting point — future extensions can bring the same discipline to capacity planning, incident analysis, operational readiness, and more.
 
 ## Install
 
