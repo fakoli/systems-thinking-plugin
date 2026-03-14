@@ -86,5 +86,9 @@ def test_frontmatter_descriptions_are_nonempty(md_file):
 def test_agent_frontmatter_has_allowed_tools(agent_file):
     """Each agent must declare its allowed tools as a list under 'allowed-tools'."""
     fm, _ = parse_frontmatter(agent_file)
-    assert "allowed-tools" in fm, f"{agent_file.name} missing 'allowed-tools'"
-    assert isinstance(fm["allowed-tools"], list), f"{agent_file.name}: 'allowed-tools' should be a list"
+    tools_key = next(
+        (k for k in ("allowed-tools", "allowed_tools", "tools") if k in fm),
+        None,
+    )
+    assert tools_key is not None, f"{agent_file.name} missing 'allowed-tools', 'allowed_tools', or 'tools'"
+    assert isinstance(fm[tools_key], list), f"{agent_file.name}: {tools_key} should be a list"

@@ -39,9 +39,10 @@ Do **not** use Pattern Remix when:
 
 Collect all prior artifacts that may be structurally relevant to the new problem. Check the following sources in order:
 
-1. `reference/previous_designs/` directory for indexed prior work, including additional prior designs, proposals, and architecture notes.
-2. User-specified file paths or repositories.
-3. Context Packets from prior workflow runs that contain relevant design extractions.
+1. `reference/previous_designs/` directory for indexed prior work.
+2. `reference/previous_designs/` directory for additional prior designs, proposals, and architecture notes.
+3. User-specified file paths or repositories.
+4. Context Packets from prior workflow runs that contain relevant design extractions.
 
 When scanning `reference/previous_designs`, present any found materials to the user for selection before proceeding — not all prior work will be relevant to the current remix.
 
