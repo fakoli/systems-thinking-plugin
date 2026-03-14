@@ -37,6 +37,8 @@ Seven v1 subagents with narrow, auditable roles:
 | `architecture-dependency-mapper` | Map control/data-plane dependencies                   | Extraction |
 | `synthesis-brief-writer`         | Turn extracted evidence into decision briefs          | Synthesis  |
 
+For the systems thinking concepts that motivate this architecture, see `docs/systems-thinking-foundations.md`.
+
 ### Skills (`skills/`)
 
 Five reusable Markdown playbooks (each in `skills/<name>/SKILL.md`):
