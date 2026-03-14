@@ -33,6 +33,13 @@ Before final completion, verify the output contains:
 - unresolved questions
 - recommended next checks
 
+## Prompt wording best practices
+
+- Use explicit approve/block decision language matching the hook output format.
+- Do not ask the LLM to "review the response you just produced" — this triggers file-access attempts in the hook execution environment. Instead, state evaluation criteria directly.
+- Scope prompts to the plugin's domain (e.g., "architecture or infrastructure analysis") so non-relevant responses auto-approve.
+- Keep prompts under 500 characters.
+
 ## If hooks feel brittle
 
 Document them as future work instead of forcing them into v1.

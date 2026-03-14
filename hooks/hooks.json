@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "Review the response you just produced. If it is a substantive analysis (not a simple factual answer or short clarification), check whether it includes: (1) explicit assumptions, (2) top risks, (3) unresolved questions, and (4) recommended next steps. If any of these are missing, append a brief note flagging what was omitted and why it matters."
+            "prompt": "You are a Stop hook for a systems-thinking plugin. If the session involved substantive architecture or infrastructure analysis (not simple answers, tool setup, or short clarifications), check whether the output includes: (1) assumptions, (2) risks, (3) unresolved questions, (4) next steps. If all present or not a substantive analysis, approve. Otherwise block noting what was omitted."
           }
         ]
       }
