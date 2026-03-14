@@ -44,7 +44,7 @@ Collect all prior artifacts that may be structurally relevant to the new problem
 3. User-specified file paths or repositories.
 4. Context Packets from prior workflow runs that contain relevant design extractions.
 
-When scanning `reference/previous_designs`, present any found materials to the user for selection before proceeding — not all prior work will be relevant to the current remix.
+When scanning `reference/previous_designs/`, present any found materials to the user for selection before proceeding — not all prior work will be relevant to the current remix.
 
 For each artifact, note:
 
