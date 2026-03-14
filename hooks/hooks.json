@@ -24,8 +24,9 @@
       {
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "You are a Stop hook for a systems-thinking plugin. If the session involved substantive architecture or infrastructure analysis (not simple answers, tool setup, or short clarifications), check whether the output includes: (1) assumptions, (2) risks, (3) unresolved questions, (4) next steps. If all present or not a substantive analysis, approve. Otherwise block noting what was omitted."
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/stop-quality-gate.sh",
+            "timeout": 10
           }
         ]
       }

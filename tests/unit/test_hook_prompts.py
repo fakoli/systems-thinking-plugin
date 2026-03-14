@@ -90,8 +90,19 @@ def test_preflight_hook_is_prompt_type(preflight_hook):
     assert preflight_hook["type"] == "prompt"
 
 
-def test_completion_hook_is_prompt_type(completion_hook):
-    assert completion_hook["type"] == "prompt"
+def test_completion_hook_is_command_type(completion_hook):
+    """Stop hook uses a command gate script to scope to systems-thinking sessions."""
+    assert completion_hook["type"] == "command"
+
+
+def test_completion_hook_references_gate_script(completion_hook):
+    """Stop hook must reference the quality gate script."""
+    assert "stop-quality-gate.sh" in completion_hook["command"]
+
+
+def test_completion_hook_uses_plugin_root(completion_hook):
+    """Stop hook command must use ${CLAUDE_PLUGIN_ROOT} for portability."""
+    assert "${CLAUDE_PLUGIN_ROOT}" in completion_hook["command"]
 
 
 # ── Content tests ────────────────────────────────────────────────────────────
@@ -108,19 +119,33 @@ def test_preflight_prompt_mentions_source_anchors(preflight_hook):
     assert "source" in prompt, "Preflight prompt should mention source"
 
 
-def test_completion_prompt_mentions_assumptions(completion_hook):
-    prompt = completion_hook["prompt"].lower()
-    assert "assumptions" in prompt
+# ── Gate script tests ───────────────────────────────────────────────────────
 
 
-def test_completion_prompt_mentions_risks(completion_hook):
-    prompt = completion_hook["prompt"].lower()
-    assert "risks" in prompt
+@pytest.fixture
+def gate_script_path():
+    from pathlib import Path
+    return Path(__file__).resolve().parents[2] / "hooks" / "stop-quality-gate.sh"
 
 
-def test_completion_prompt_mentions_unresolved(completion_hook):
-    prompt = completion_hook["prompt"].lower()
-    assert "unresolved" in prompt
+def test_gate_script_exists(gate_script_path):
+    assert gate_script_path.is_file(), "stop-quality-gate.sh must exist in hooks/"
+
+
+def test_gate_script_checks_quality_keywords(gate_script_path):
+    """Gate script must check for assumptions, risks, unresolved, and next steps."""
+    content = gate_script_path.read_text().lower()
+    assert "assumption" in content
+    assert "risk" in content
+    assert "unresolved" in content
+    assert "next step" in content or "next check" in content
+
+
+def test_gate_script_checks_systems_thinking_patterns(gate_script_path):
+    """Gate script must check for systems-thinking agent/skill identifiers."""
+    content = gate_script_path.read_text().lower()
+    assert "systems-thinking" in content
+    assert "architecture-dependency-mapper" in content or "caveat-extractor" in content
 
 
 # ── Quality constraints ──────────────────────────────────────────────────────
