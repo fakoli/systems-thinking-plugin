@@ -32,6 +32,27 @@ End-to-end scenario tests that invoke Claude CLI with specific prompts and grade
 - `@anthropic-ai/claude-code` installed globally (`npm install -g @anthropic-ai/claude-code`)
 - `ANTHROPIC_API_KEY` environment variable set
 
+## Running Eval Tests Manually
+
+Eval tests invoke the Claude CLI end-to-end and are **non-deterministic** — they depend on model output, can be slow, and may time out. They should be run manually rather than as part of automated CI gates.
+
+```bash
+# Run all eval tests
+.venv/bin/python -m pytest tests/evals/ -v
+
+# Run a single eval case
+.venv/bin/python -m pytest tests/evals/test_evals.py::test_eval_case[complexity_mapper_basic] -v
+.venv/bin/python -m pytest tests/evals/test_evals.py::test_eval_case[decision_brief_basic] -v
+.venv/bin/python -m pytest tests/evals/test_evals.py::test_eval_case[hook_enforcement] -v
+
+# With a longer timeout (default is 120s, which may not be enough)
+.venv/bin/python -m pytest tests/evals/ -v --timeout=600
+```
+
+**Prerequisites:** `claude` CLI installed globally and `ANTHROPIC_API_KEY` set. Eval tests cost API credits.
+
+**Expected behavior:** These tests may fail intermittently due to model output variability or timeouts. A single failure does not indicate a plugin bug — re-run the specific case before investigating.
+
 ## Adding New Tests
 
 ### Unit and Contract Tests

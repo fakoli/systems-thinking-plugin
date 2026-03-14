@@ -17,12 +17,19 @@ def hooks(settings):
 
 @pytest.fixture
 def preflight_hook(hooks):
-    return hooks["UserPromptSubmit"][0]
+    entry = hooks["UserPromptSubmit"][0]
+    # Support nested format: entry may have a "hooks" array wrapping the actual hook
+    if "hooks" in entry and isinstance(entry["hooks"], list):
+        return entry["hooks"][0]
+    return entry
 
 
 @pytest.fixture
 def completion_hook(hooks):
-    return hooks["Stop"][0]
+    entry = hooks["Stop"][0]
+    if "hooks" in entry and isinstance(entry["hooks"], list):
+        return entry["hooks"][0]
+    return entry
 
 
 # ── Structure tests ──────────────────────────────────────────────────────────
@@ -88,19 +95,28 @@ def test_completion_prompt_mentions_unresolved(completion_hook):
 # ── Quality constraints ──────────────────────────────────────────────────────
 
 
+def _flatten_hooks(entries):
+    """Yield individual hook dicts, handling both flat and nested formats."""
+    for entry in entries:
+        if "hooks" in entry and isinstance(entry["hooks"], list):
+            yield from entry["hooks"]
+        else:
+            yield entry
+
+
 def test_hook_prompts_are_concise(hooks):
     """Each hook prompt should be under 500 characters to stay focused."""
     for hook_type, entries in hooks.items():
-        for i, entry in enumerate(entries):
-            if "prompt" in entry:
-                length = len(entry["prompt"])
+        for i, hook in enumerate(_flatten_hooks(entries)):
+            if "prompt" in hook:
+                length = len(hook["prompt"])
                 assert length < 500, f"{hook_type}[{i}] prompt is {length} chars (max 500)"
 
 
 def test_no_bash_hooks(hooks):
     """v1 should use prompt-only hooks, no bash hooks."""
     for hook_type, entries in hooks.items():
-        for i, entry in enumerate(entries):
-            assert entry.get("type") != "bash", (
+        for i, hook in enumerate(_flatten_hooks(entries)):
+            assert hook.get("type") != "bash", (
                 f"{hook_type}[{i}] has type 'bash'; only 'prompt' allowed in v1"
             )
