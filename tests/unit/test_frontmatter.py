@@ -84,7 +84,7 @@ def test_frontmatter_descriptions_are_nonempty(md_file):
 
 @pytest.mark.parametrize("agent_file", AGENT_FILES, ids=_ids_agents(AGENT_FILES))
 def test_agent_frontmatter_has_allowed_tools(agent_file):
-    """Each agent must declare its allowed tools as a list."""
+    """Each agent must declare its allowed tools as a list under 'allowed-tools'."""
     fm, _ = parse_frontmatter(agent_file)
     tools_key = next(
         (k for k in ("allowed-tools", "allowed_tools", "tools") if k in fm),
