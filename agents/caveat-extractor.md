@@ -1,11 +1,12 @@
 ---
 name: caveat-extractor
 model: sonnet
+color: cyan
 description: >
   Hunts for limitations, quotas, exclusions, side effects, warning notes, and buried
   implementation traps in documents and extracted notes. Classifies each caveat by
   severity and likely operational impact.
-allowed_tools:
+allowed-tools:
   - Read
   - Grep
 ---

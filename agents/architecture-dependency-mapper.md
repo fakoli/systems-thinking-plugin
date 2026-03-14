@@ -1,11 +1,12 @@
 ---
 name: architecture-dependency-mapper
 model: sonnet
+color: cyan
 description: >
   Maps control-plane, data-plane, routing, ownership, and operational dependencies
   that affect delivery risk. Identifies single points of failure, blast radius concerns,
   and cross-team or cross-vendor dependencies.
-allowed_tools:
+allowed-tools:
   - Read
   - Grep
   - Glob

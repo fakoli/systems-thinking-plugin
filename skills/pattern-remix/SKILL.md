@@ -28,7 +28,7 @@ Do **not** use Pattern Remix when:
 
 | Input           | Required | Description                                                                                                                                                        |
 | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Prior artifacts | Yes      | Designs, implementations, architecture docs, or decision records from previous successful work. Source from `.seed/previous_designs/` or user-specified locations. |
+| Prior artifacts | Yes      | Designs, implementations, architecture docs, or decision records from previous successful work. Source from `reference/previous_designs/` or user-specified locations. |
 | Target state    | Yes      | Clear description of what the new design must achieve — goals, success criteria, user/system requirements.                                                         |
 | Constraints     | Yes      | Hard boundaries: budget, timeline, technology mandates, compliance requirements, team capabilities.                                                                |
 | Anti-patterns   | No       | Known failure modes, rejected approaches, or patterns explicitly ruled out for the new context.                                                                    |
@@ -39,7 +39,7 @@ Do **not** use Pattern Remix when:
 
 Collect all prior artifacts that may be structurally relevant to the new problem. Check the following sources in order:
 
-1. `.seed/previous_designs/` directory for indexed prior work.
+1. `reference/previous_designs/` directory for indexed prior work.
 2. `reference/previous_designs/` directory for additional prior designs, proposals, and architecture notes.
 3. User-specified file paths or repositories.
 4. Context Packets from prior workflow runs that contain relevant design extractions.

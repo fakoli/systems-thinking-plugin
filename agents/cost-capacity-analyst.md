@@ -1,11 +1,12 @@
 ---
 name: cost-capacity-analyst
 model: sonnet
+color: cyan
 description: >
   Highlights cost mechanics, throughput assumptions, scaling constraints, support burden,
   and capacity implications from documents and design notes. Distinguishes confirmed
   pricing from estimated or inferred pricing.
-allowed_tools:
+allowed-tools:
   - Read
   - Grep
 ---
