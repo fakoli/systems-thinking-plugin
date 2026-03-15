@@ -188,11 +188,13 @@ Start with the top-level structure and go one level deep into each major directo
 
 ---
 
-## Scenario 5: Multi-cloud architecture research (full pipeline)
+## Scenario 5: Platform migration evaluation (full pipeline with web research)
 
 ### Situation
 
-You're designing a multi-cloud network architecture — AWS as primary with GCP expansion, shared VPC model, hundreds of thousands of hosts, HA VPN initially migrating to dedicated interconnect. You need to understand the real constraints, hidden costs, and operational traps across both cloud providers before committing to the design. The material doesn't exist locally — you need the agents to research vendor documentation from the web.
+Your team is evaluating a migration from a self-managed service to a vendor's managed platform — could be a database, a message queue, a container orchestration platform, or any managed service. The vendor's pitch looks clean, the demo worked, and the pricing page makes sense. But you've been through enough of these to know: the real costs and constraints don't show up until you're committed. You want the full picture before signing anything.
+
+The material doesn't all exist locally — you need the agents to research the vendor's documentation from the web alongside your internal architecture docs.
 
 ### Recommended skill
 
@@ -200,18 +202,18 @@ You're designing a multi-cloud network architecture — AWS as primary with GCP 
 
 ### What happens under the hood
 
-1. **doc-indexer** maps any local materials you've provided (architecture docs, design proposals).
+1. **doc-indexer** maps any local materials you've provided (vendor proposals, internal architecture docs, migration plans).
 
-2. **web-researcher** discovers external sources — AWS VPC IPAM quotas, GCP Shared VPC limits, interconnect pricing pages, BGP route limits, Kubernetes networking defaults. Produces a **Source Manifest** listing every source found, with relevance ratings and gaps (e.g., "GCP VPN pricing page returned JavaScript-only content").
+2. **web-researcher** discovers external sources — the vendor's quota pages, pricing calculators, SLA documents, known issues pages, community forums with production war stories. Produces a **Source Manifest** listing every source found, with relevance ratings and gaps (e.g., "pricing calculator requires JavaScript — not fully extractable").
 
-3. **extraction-planner** assesses the total volume — 20+ sections across multiple vendors — and produces a **Dispatch Plan**: "spawn 4 caveat-extractors (AWS platform, GCP platform, connectivity, address space), 1 cost-capacity-analyst, 2 architecture-dependency-mappers." Each agent gets scoped instructions specifying exactly which sections to read and what to focus on.
+3. **extraction-planner** assesses the total volume — 20+ sections across vendor docs and internal materials — and produces a **Dispatch Plan**: "spawn 3 caveat-extractors (platform limits, operational constraints, migration risks), 1 cost-capacity-analyst, 1 architecture-dependency-mapper." Each agent gets scoped instructions specifying exactly which sections to read and what to focus on.
 
 4. Extraction agents run in parallel (~60-90 seconds). Each produces findings with source anchors:
-   - Caveat-extractors surface hard limits (AWS NAU ceiling at 256K, GCP's 170 secondary ranges per subnet), behavioral traps (auto-mode VPC claiming half the /8), and cross-cloud gaps (no native IPAM spanning both clouds).
-   - Cost-capacity-analyst confirms pricing ($0.1944/IP/month for IPAM Advanced Tier, $1,620/month for Direct Connect 10G) and flags hidden multipliers (NAT Gateway processing fees, inter-AZ transfer costs).
-   - Architecture-dependency-mappers identify SPOFs (IPAM admin account, GCP host project), chokepoints (Cloud Router, Direct Connect Gateway), and cross-vendor coordination risks (three-way BGP for interconnect migration).
+   - Caveat-extractors surface hard limits buried in quota tables, SLA exclusions that carve out the scenarios you care about most, behavioral differences between the managed version and what you're running today, and migration constraints the vendor's sales team didn't mention.
+   - Cost-capacity-analyst confirms base pricing and flags hidden multipliers — the per-operation fees that compound at your scale, the data transfer costs between components, the premium tier you'll need for the features the demo showed.
+   - Architecture-dependency-mapper identifies what breaks if the managed service goes down, what new dependencies you're inheriting, and where your rollback path has gaps.
 
-5. **synthesis-brief-writer** combines all findings into a **Complexity Heat Map** and **Hidden Risk Summary**, cross-referencing across agents to surface compound risks (e.g., NAU ceiling + GKE pod range defaults = 47% of address space consumed before you've even started).
+5. **synthesis-brief-writer** combines all findings into a **Complexity Heat Map** and **Hidden Risk Summary**, cross-referencing across agents to surface compound risks — the places where two individually manageable constraints combine into a serious problem.
 
 ### Expected outputs
 
@@ -227,19 +229,19 @@ You're designing a multi-cloud network architecture — AWS as primary with GCP 
 ```
 /complexity-mapper
 
-Analyze this multi-cloud architecture for hidden risks:
-- AWS primary with GCP expansion
-- Shared VPC model, 320K NAU
-- HA VPN initially, migrating to dedicated interconnect via Megaport
-- Using 10.0.0.0/8 as the enterprise address space
+We're evaluating migrating from self-managed PostgreSQL to [Vendor]'s
+managed database platform. Analyze their documentation for hidden risks.
 
-Focus on: quotas that bite at scale, cost mechanics across both clouds,
-cross-cloud coordination gaps, and migration path risks.
+Internal docs: reference/vendor_docs/vendor-proposal.md
+Architecture: reference/previous_designs/current-db-architecture.md
+
+Focus on: SLA exclusions, pricing at our scale (2TB, 50K IOPS),
+failover behavior, backup/restore guarantees, and migration risks.
 ```
 
 ### What makes this scenario different
 
-This is the full pipeline — web research, dispatch planning, parallel extraction, and synthesis all working together. The key insight is that the extraction-planner prevents the overload that would happen if a single caveat-extractor tried to process 20+ sections of multi-cloud documentation at once. By scoping each agent to a specific topic area and bounded set of sections, the extraction stays fast and focused.
+This is the full pipeline — web research, dispatch planning, parallel extraction, and synthesis all working together. The key insight is that the extraction-planner prevents the overload that would happen if a single caveat-extractor tried to process 20+ sections of vendor documentation at once. By scoping each agent to a specific topic area and bounded set of sections, the extraction stays fast and focused.
 
 ---
 
