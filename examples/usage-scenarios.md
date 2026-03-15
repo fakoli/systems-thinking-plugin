@@ -1,6 +1,6 @@
 # Usage Scenarios
 
-Four worked examples showing how to use the systems-thinking-plugin in practice. Each scenario describes the situation, which skill to invoke, what happens under the hood, and what outputs to expect.
+Five worked examples showing how to use the systems-thinking-plugin in practice. Each scenario describes the situation, which skill to invoke, what happens under the hood, and what outputs to expect.
 
 ---
 
@@ -185,6 +185,61 @@ Orient me to this repository. I need to understand:
 
 Start with the top-level structure and go one level deep into each major directory.
 ```
+
+---
+
+## Scenario 5: Multi-cloud architecture research (full pipeline)
+
+### Situation
+
+You're designing a multi-cloud network architecture — AWS as primary with GCP expansion, shared VPC model, hundreds of thousands of hosts, HA VPN initially migrating to dedicated interconnect. You need to understand the real constraints, hidden costs, and operational traps across both cloud providers before committing to the design. The material doesn't exist locally — you need the agents to research vendor documentation from the web.
+
+### Recommended skill
+
+**complexity-mapper** with web research enabled. This exercises the full pipeline: `web-researcher` → `doc-indexer` → `extraction-planner` → parallel extractors → `synthesis-brief-writer`.
+
+### What happens under the hood
+
+1. **doc-indexer** maps any local materials you've provided (architecture docs, design proposals).
+
+2. **web-researcher** discovers external sources — AWS VPC IPAM quotas, GCP Shared VPC limits, interconnect pricing pages, BGP route limits, Kubernetes networking defaults. Produces a **Source Manifest** listing every source found, with relevance ratings and gaps (e.g., "GCP VPN pricing page returned JavaScript-only content").
+
+3. **extraction-planner** assesses the total volume — 20+ sections across multiple vendors — and produces a **Dispatch Plan**: "spawn 4 caveat-extractors (AWS platform, GCP platform, connectivity, address space), 1 cost-capacity-analyst, 2 architecture-dependency-mappers." Each agent gets scoped instructions specifying exactly which sections to read and what to focus on.
+
+4. Extraction agents run in parallel (~60-90 seconds). Each produces findings with source anchors:
+   - Caveat-extractors surface hard limits (AWS NAU ceiling at 256K, GCP's 170 secondary ranges per subnet), behavioral traps (auto-mode VPC claiming half the /8), and cross-cloud gaps (no native IPAM spanning both clouds).
+   - Cost-capacity-analyst confirms pricing ($0.1944/IP/month for IPAM Advanced Tier, $1,620/month for Direct Connect 10G) and flags hidden multipliers (NAT Gateway processing fees, inter-AZ transfer costs).
+   - Architecture-dependency-mappers identify SPOFs (IPAM admin account, GCP host project), chokepoints (Cloud Router, Direct Connect Gateway), and cross-vendor coordination risks (three-way BGP for interconnect migration).
+
+5. **synthesis-brief-writer** combines all findings into a **Complexity Heat Map** and **Hidden Risk Summary**, cross-referencing across agents to surface compound risks (e.g., NAU ceiling + GKE pod range defaults = 47% of address space consumed before you've even started).
+
+### Expected outputs
+
+- **Source Manifest** — catalog of all web and local sources discovered
+- **Dispatch Plan** — how extraction was parallelized and why
+- **Context Packets** — raw findings per extraction agent with source anchors
+- **Complexity Heat Map** — ranked complexity areas (quotas, cost traps, dependencies, scaling cliffs)
+- **Hidden Risk Summary** — top risks with evidence, compound failure scenarios, unresolved questions
+- Optionally, feed everything into **decision-brief** for a stakeholder-ready package
+
+### How to invoke
+
+```
+/complexity-mapper
+
+Analyze this multi-cloud architecture for hidden risks:
+- AWS primary with GCP expansion
+- Shared VPC model, 320K NAU
+- HA VPN initially, migrating to dedicated interconnect via Megaport
+- Using 10.0.0.0/8 as the enterprise address space
+
+Focus on: quotas that bite at scale, cost mechanics across both clouds,
+cross-cloud coordination gaps, and migration path risks.
+```
+
+### What makes this scenario different
+
+This is the full pipeline — web research, dispatch planning, parallel extraction, and synthesis all working together. The key insight is that the extraction-planner prevents the overload that would happen if a single caveat-extractor tried to process 20+ sections of multi-cloud documentation at once. By scoping each agent to a specific topic area and bounded set of sections, the extraction stays fast and focused.
 
 ---
 

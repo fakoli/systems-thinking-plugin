@@ -57,6 +57,136 @@ Package extracted findings into a stakeholder-ready **Decision Brief** with evid
 
 Focused risk assessment of a specific architecture — failure modes, hidden dependencies, single points of failure, blast radius, operational survivability. The questions a systems engineer asks before signing off on a design. Produces a **Hidden Risk Summary** with architectural focus.
 
+## How it works
+
+Here's what a typical `/complexity-mapper` session looks like in Claude Code. The same pipeline pattern applies to all workflows — the agents and outputs change, but the rhythm is the same.
+
+### 1. Invoke the skill
+
+```
+You: /complexity-mapper
+
+     Analyze this multi-cloud VPC architecture for hidden risks.
+     We're planning AWS as primary with GCP expansion, shared VPC
+     model, 320K hosts, HA VPN initially moving to dedicated
+     interconnect via Megaport.
+```
+
+You describe what you're evaluating and what concerns you. The skill takes it from there.
+
+### 2. Document indexing (~10 seconds)
+
+Claude invokes the `doc-indexer` agent, which scans your provided materials and maps the structure — headings, sections, high-value areas, caveat-rich zones:
+
+```
+  doc-indexer scanning 3 documents...
+
+  Document: vpc-architecture.md
+    12 sections mapped, 4 flagged as high-value
+    Caveat-rich areas: Quotas table (L45), Pricing notes (L112)
+
+  Document: interconnect-proposal.md
+    8 sections mapped, 2 flagged
+    Gap identified: no failover documentation
+
+  Prioritized Reading List:
+  | Priority | Section              | Recommended Agent           |
+  |----------|----------------------|-----------------------------|
+  | P1       | VPC quotas & limits  | caveat-extractor            |
+  | P1       | Pricing mechanics    | cost-capacity-analyst       |
+  | P1       | Service dependencies | architecture-dependency-mapper |
+  | P2       | Migration timeline   | doc-reader                  |
+```
+
+### 3. Source discovery (when external docs are needed)
+
+If the doc-indexer identifies gaps — vendor quotas not in your files, pricing pages you don't have locally — Claude invokes the `web-researcher` to find them:
+
+```
+  web-researcher discovering sources for 3 topics...
+
+  Source Manifest:
+  | # | Title                      | URL                              | Relevance |
+  |---|----------------------------|----------------------------------|-----------|
+  | 1 | AWS VPC IPAM Quotas        | docs.aws.amazon.com/vpc/...      | High      |
+  | 2 | GCP Shared VPC Limits      | cloud.google.com/vpc/docs/...    | High      |
+  | 3 | AWS Direct Connect Pricing | aws.amazon.com/directconnect/... | High      |
+
+  Gaps: GCP VPN pricing page returned JavaScript-only content (not extractable)
+```
+
+Claude presents the Source Manifest for your review before proceeding. You can add or remove sources.
+
+### 4. Dispatch planning (~10 seconds)
+
+The `extraction-planner` looks at the total volume of material and decides how to parallelize the work — how many extraction agents to spawn and what scoped instructions each gets:
+
+```
+  extraction-planner assessing material volume...
+
+  Dispatch Plan:
+  - Total sections: 23
+  - Material volume: Large
+  - Recommended: 6 extraction agents
+
+  | Agent # | Type                         | Focus Scope                    |
+  |---------|------------------------------|--------------------------------|
+  | 1       | caveat-extractor             | AWS VPC quotas, NAU limits     |
+  | 2       | caveat-extractor             | GCP Shared VPC, GKE ranges     |
+  | 3       | caveat-extractor             | Connectivity, VPN/interconnect |
+  | 4       | cost-capacity-analyst        | Pricing across all services    |
+  | 5       | architecture-dependency-mapper| Cross-cloud dependencies       |
+  | 6       | architecture-dependency-mapper| Migration path dependencies    |
+```
+
+This step prevents the overload that happens when a single agent tries to process too much material at once. Each agent gets bounded, focused instructions.
+
+### 5. Parallel extraction (~30-90 seconds)
+
+Claude launches the extraction agents in parallel. Each one works on its assigned sections and produces findings with source anchors:
+
+```
+  Launching 6 extraction agents in parallel...
+
+  ✓ caveat-extractor (AWS): 29 caveats found (9 critical)
+  ✓ caveat-extractor (GCP): 31 caveats found (9 critical)
+  ✓ caveat-extractor (connectivity): 18 caveats found (5 critical)
+  ✓ cost-capacity-analyst: 22 pricing items confirmed, 6 unknown
+  ✓ architecture-dependency-mapper (cross-cloud): 14 dependencies, 4 SPOFs
+  ✓ architecture-dependency-mapper (migration): 7 dependencies, 2 chokepoints
+```
+
+### 6. Synthesis (~30-60 seconds)
+
+The `synthesis-brief-writer` combines all extraction outputs into structured artifacts:
+
+```
+Complexity Heat Map
+
+| Area                  | Type       | Likelihood | Impact | Visibility |
+|-----------------------|------------|------------|--------|------------|
+| GKE pod range sizing  | Cost       | High       | High   | Hidden     |
+| VPC NAU ceiling 256K  | Quota      | Critical   | High   | Hidden     |
+| No cross-cloud IPAM   | Dependency | High       | High   | Hidden     |
+| HA VPN bandwidth cap  | Scaling    | Medium     | High   | Visible    |
+
+Top 3 Risks:
+1. 320K NAU exceeds AWS per-VPC ceiling (256K max) — multi-VPC mandatory
+2. GKE pod ranges consume 47% of /8 at default sizing — immutable setting
+3. No native cross-cloud IPAM — overlapping CIDRs undetectable
+```
+
+The full output includes source anchors for every finding, severity ratings, unresolved questions, and recommended next steps — ready for a design review or stakeholder conversation.
+
+### What to expect
+
+- **Total time:** 2-5 minutes for a typical analysis, depending on material volume and whether web research is needed
+- **Token usage:** Varies with material size. Small analyses (≤5 sections) use minimal tokens. Large multi-cloud research can use significantly more.
+- **User interaction:** The skill runs mostly autonomously. You'll be asked to review the Source Manifest (if web research fires) and may be asked clarifying questions if the material is ambiguous.
+- **Output location:** Results are delivered inline in the conversation. Use `/decision-brief` afterward to package findings for stakeholders.
+
+For more worked examples, see `examples/usage-scenarios.md`.
+
 ## Agents
 
 The visible tip of the iceberg is what the vendor shows you. Everything below the waterline is what these agents find.
