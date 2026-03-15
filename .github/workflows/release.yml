@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from plugin.json
+        id: version
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag v${{ steps.version.outputs.version }} already exists — skipping release"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Tag v${{ steps.version.outputs.version }} is new — will create release"
+          fi
+
+      - name: Verify versions are in sync
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          PLUGIN_VERSION=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          PYPROJECT_VERSION=$(python3 -c "
+          import re
+          content = open('pyproject.toml').read()
+          match = re.search(r'^version\s*=\s*\"(.+?)\"', content, re.MULTILINE)
+          print(match.group(1) if match else 'NOT_FOUND')
+          ")
+          VERSION_FILE=$(cat VERSION 2>/dev/null | tr -d '[:space:]' || echo "NOT_FOUND")
+
+          echo "plugin.json:  $PLUGIN_VERSION"
+          echo "pyproject.toml: $PYPROJECT_VERSION"
+          echo "VERSION:      $VERSION_FILE"
+
+          ERRORS=0
+          if [ "$PLUGIN_VERSION" != "$PYPROJECT_VERSION" ]; then
+            echo "::error::Version mismatch: plugin.json ($PLUGIN_VERSION) != pyproject.toml ($PYPROJECT_VERSION)"
+            ERRORS=1
+          fi
+          if [ "$PLUGIN_VERSION" != "$VERSION_FILE" ]; then
+            echo "::error::Version mismatch: plugin.json ($PLUGIN_VERSION) != VERSION ($VERSION_FILE)"
+            ERRORS=1
+          fi
+          if [ "$ERRORS" -eq 1 ]; then
+            exit 1
+          fi
+          echo "All version files in sync at $PLUGIN_VERSION"
+
+      - name: Extract changelog for this version
+        if: steps.check_tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Extract the section for this version from CHANGELOG.md
+          python3 << SCRIPT
+          import re, os
+
+          with open("CHANGELOG.md", "r") as f:
+              content = f.read()
+
+          # Find the section for this version
+          pattern = rf"## \[{re.escape('$VERSION')}].*?\n(.*?)(?=\n## \[|\Z)"
+          match = re.search(pattern, content, re.DOTALL)
+
+          if match:
+              notes = match.group(1).strip()
+          else:
+              notes = "No changelog entry found for version $VERSION."
+
+          # Write to file for the release body
+          with open("release-notes.md", "w") as f:
+              f.write(notes)
+
+          print(f"Extracted {len(notes)} chars of release notes")
+          SCRIPT
+
+      - name: Create GitHub Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body_path: release-notes.md
+          generate_release_notes: false
