@@ -11,6 +11,12 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/discover-components.sh"
 
+# jq is required to parse hook input — skip silently if missing
+# (SessionStart hook will have already warned the user)
+if [ "$JQ_AVAILABLE" = "false" ]; then
+  exit 0
+fi
+
 input=$(cat)
 user_prompt=$(echo "$input" | jq -r '.user_prompt // empty')
 transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')

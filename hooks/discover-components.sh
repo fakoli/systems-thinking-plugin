@@ -9,6 +9,13 @@
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
+# jq is required for parsing hook stdin JSON. If missing, set a flag so
+# callers can decide how to handle it (approve silently vs warn).
+JQ_AVAILABLE=true
+if ! command -v jq > /dev/null 2>&1; then
+  JQ_AVAILABLE=false
+fi
+
 # Discover skills from skills/ subdirectories
 SKILL_NAMES=""
 if [ -d "$PLUGIN_ROOT/skills" ]; then
