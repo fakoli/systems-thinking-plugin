@@ -118,7 +118,11 @@ def test_extraction_agents_have_extraction_instructions(filename):
 def test_allowed_tools_are_valid(filename):
     """Agent allowed_tools must only use known tool names."""
     fm, _ = parse_frontmatter(_agent_path(filename))
-    tools_key = "allowed_tools" if "allowed_tools" in fm else "tools"
+    tools_key = next(
+        (k for k in ("allowed-tools", "allowed_tools", "tools") if k in fm),
+        None,
+    )
+    assert tools_key is not None, f"{filename} missing 'allowed-tools', 'allowed_tools', or 'tools'"
     tools = fm.get(tools_key, [])
     invalid = [t for t in tools if t not in VALID_TOOLS]
     assert not invalid, f"{filename} has invalid tools: {invalid}. Allowed: {VALID_TOOLS}"

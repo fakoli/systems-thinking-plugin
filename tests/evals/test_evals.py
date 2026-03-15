@@ -19,6 +19,7 @@ Output and cost tracking:
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -194,24 +195,18 @@ def _parse_usage_from_stderr(stderr: str) -> dict:
     or JSON-formatted usage blocks.
     """
     usage = {"input_tokens": 0, "output_tokens": 0, "cost_estimate": 0.0}
+    _INT_RE = re.compile(r"\b(\d[\d,]*)\b")
 
     for line in stderr.splitlines():
         line_lower = line.strip().lower()
         if "input" in line_lower and "token" in line_lower:
-            # Try to extract number
-            parts = line.strip().split()
-            for part in parts:
-                part_clean = part.replace(",", "").replace(".", "")
-                if part_clean.isdigit():
-                    usage["input_tokens"] = int(part_clean)
-                    break
+            m = _INT_RE.search(line)
+            if m:
+                usage["input_tokens"] = int(m.group(1).replace(",", ""))
         elif "output" in line_lower and "token" in line_lower:
-            parts = line.strip().split()
-            for part in parts:
-                part_clean = part.replace(",", "").replace(".", "")
-                if part_clean.isdigit():
-                    usage["output_tokens"] = int(part_clean)
-                    break
+            m = _INT_RE.search(line)
+            if m:
+                usage["output_tokens"] = int(m.group(1).replace(",", ""))
 
     usage["cost_estimate"] = (
         usage["input_tokens"] * _INPUT_COST_PER_TOKEN
@@ -324,7 +319,11 @@ def test_eval_case(case_path: Path) -> None:
                 f"Full output saved to: {result_dir}"
             )
 
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
+        # subprocess.run() does not kill the child on timeout — do it manually
+        if exc.process is not None:
+            exc.process.kill()
+            exc.process.communicate()
         print(f"\n  --- Eval: {case_name} ---")
         print(f"  TIMED OUT after {timeout}s")
         pytest.fail(f"Eval '{case_name}' timed out after {timeout}s")
