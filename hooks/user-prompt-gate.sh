@@ -1,6 +1,6 @@
 #!/bin/bash
-# Only inject the extraction/synthesis reminder when the user's prompt
-# references systems-thinking skills or workflows.
+# Only inject the extraction/synthesis reminder when a systems-thinking
+# skill or agent is being explicitly invoked — not on casual mentions.
 #
 # Reads JSON from stdin (Claude Code hook system).
 # Outputs a prompt message to stdout only when relevant.
@@ -17,13 +17,19 @@ transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
 
 REMINDER="Before proceeding, remember: separate extraction from synthesis. Preserve source anchors (file, section, page) on every finding. Do not collapse raw evidence into inferred conclusions until extraction is complete."
 
-# Check the user's current prompt for systems-thinking intent
-if echo "$user_prompt" | grep -qiE "$PROMPT_KEYWORDS" 2>/dev/null; then
-  echo "$REMINDER"
-  exit 0
+# Only match explicit slash-command invocations in the user's prompt.
+# This avoids false positives when users paste code reviews or discuss
+# plugin internals that happen to mention component names.
+if [ -n "$SKILL_NAMES" ]; then
+  SLASH_PATTERN="^/($SKILL_NAMES)"
+  if echo "$user_prompt" | grep -qiE "$SLASH_PATTERN" 2>/dev/null; then
+    echo "$REMINDER"
+    exit 0
+  fi
 fi
 
-# Also check if a systems-thinking workflow is already active in the transcript
+# Check if a systems-thinking workflow is already active in the transcript
+# (actual tool invocations, not casual mentions)
 if [ -n "$transcript_path" ] && [ -f "$transcript_path" ]; then
   if grep -qE "$INVOCATION_PATTERNS" "$transcript_path" 2>/dev/null; then
     echo "$REMINDER"

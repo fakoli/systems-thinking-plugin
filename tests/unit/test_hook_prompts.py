@@ -135,6 +135,21 @@ def test_preflight_gate_mentions_source_anchors(user_prompt_gate_path):
     assert "source" in content, "Preflight gate should mention source"
 
 
+def test_preflight_gate_uses_slash_command_matching(user_prompt_gate_path):
+    """Preflight gate must match slash-command invocations, not loose keyword mentions."""
+    content = user_prompt_gate_path.read_text()
+    assert "SLASH_PATTERN" in content or "^/" in content, (
+        "Preflight gate must use slash-command pattern matching to avoid "
+        "false positives on casual mentions of component names"
+    )
+
+
+def test_preflight_gate_sources_discover_components(user_prompt_gate_path):
+    """Preflight gate must source discover-components.sh for dynamic discovery."""
+    content = user_prompt_gate_path.read_text()
+    assert "discover-components.sh" in content
+
+
 # ── Gate script tests ───────────────────────────────────────────────────────
 
 
