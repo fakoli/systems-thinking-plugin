@@ -22,12 +22,17 @@ import pytest
 import yaml
 
 from tests.evals.graders.composite import grade_composite
+from tests.evals.graders.cross_reference_consistency import grade_cross_reference_consistency
+from tests.evals.graders.evidence_labels import grade_evidence_labels
 from tests.evals.graders.file_exists import grade_files_exist
 from tests.evals.graders.forbidden_check import (
     grade_no_forbidden_files,
     grade_no_forbidden_patterns,
 )
+from tests.evals.graders.quantitative_claims import grade_quantitative_claims
+from tests.evals.graders.schema_match import grade_markdown_structure
 from tests.evals.graders.section_check import grade_sections
+from tests.evals.graders.source_anchor_coverage import grade_source_anchor_coverage
 
 HARNESS_DIR = Path(__file__).resolve().parent
 CASES_DIR = HARNESS_DIR / "cases"
@@ -98,6 +103,36 @@ def _run_single_grader(outcome: dict, workdir: Path, expected: bool) -> dict:
     if outcome_type == "forbidden_patterns":
         filepath = _resolve_file(outcome["file"], workdir)
         return grade_no_forbidden_patterns(filepath, outcome["patterns"])
+
+    if outcome_type == "markdown_structure":
+        filepath = _resolve_file(outcome["file"], workdir)
+        return grade_markdown_structure(filepath, outcome["headings"])
+
+    if outcome_type == "source_anchor_coverage":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {"min_coverage": outcome.get("min_coverage", 0.5)}
+        return grade_source_anchor_coverage(filepath, config)
+
+    if outcome_type == "evidence_labels":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {
+            "min_source_labels": outcome.get("min_source_labels", 3),
+            "min_inferred_labels": outcome.get("min_inferred_labels", 1),
+        }
+        return grade_evidence_labels(filepath, config)
+
+    if outcome_type == "quantitative_claims":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {"claims": outcome.get("claims", [])}
+        return grade_quantitative_claims(filepath, config)
+
+    if outcome_type == "cross_reference_consistency":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {
+            "sections_to_cross_check": outcome.get("sections_to_cross_check", []),
+            "min_overlap": outcome.get("min_overlap", 0.3),
+        }
+        return grade_cross_reference_consistency(filepath, config)
 
     return {
         "pass": False,

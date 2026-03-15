@@ -25,12 +25,17 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from graders.composite import grade_composite
+from graders.cross_reference_consistency import grade_cross_reference_consistency
+from graders.evidence_labels import grade_evidence_labels
 from graders.file_exists import grade_files_exist
 from graders.forbidden_check import (
     grade_no_forbidden_files,
     grade_no_forbidden_patterns,
 )
+from graders.quantitative_claims import grade_quantitative_claims
+from graders.schema_match import grade_markdown_structure
 from graders.section_check import grade_sections
+from graders.source_anchor_coverage import grade_source_anchor_coverage
 
 HARNESS_DIR = Path(__file__).resolve().parent
 CASES_DIR = HARNESS_DIR / "cases"
@@ -184,6 +189,36 @@ def _run_single_grader(outcome: dict, workdir: Path, expected: bool) -> dict:
         filepath = _resolve_file(outcome["file"], workdir)
         return grade_no_forbidden_patterns(filepath, outcome["patterns"])
 
+    if outcome_type == "markdown_structure":
+        filepath = _resolve_file(outcome["file"], workdir)
+        return grade_markdown_structure(filepath, outcome["headings"])
+
+    if outcome_type == "source_anchor_coverage":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {"min_coverage": outcome.get("min_coverage", 0.5)}
+        return grade_source_anchor_coverage(filepath, config)
+
+    if outcome_type == "evidence_labels":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {
+            "min_source_labels": outcome.get("min_source_labels", 3),
+            "min_inferred_labels": outcome.get("min_inferred_labels", 1),
+        }
+        return grade_evidence_labels(filepath, config)
+
+    if outcome_type == "quantitative_claims":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {"claims": outcome.get("claims", [])}
+        return grade_quantitative_claims(filepath, config)
+
+    if outcome_type == "cross_reference_consistency":
+        filepath = _resolve_file(outcome["file"], workdir)
+        config = {
+            "sections_to_cross_check": outcome.get("sections_to_cross_check", []),
+            "min_overlap": outcome.get("min_overlap", 0.3),
+        }
+        return grade_cross_reference_consistency(filepath, config)
+
     return {
         "pass": False,
         "score": 0.0,
@@ -224,6 +259,9 @@ def run_single_eval(case_path: Path, dry_run: bool = False) -> dict[str, Any]:
         "duration": 0.0,
         "error": None,
         "grader_results": [],
+        "stdout_length": 0,
+        "output_file_sizes": {},
+        "timed_out": False,
     }
 
     try:
@@ -253,6 +291,7 @@ def run_single_eval(case_path: Path, dry_run: bool = False) -> dict[str, Any]:
         except subprocess.TimeoutExpired:
             result["error"] = f"Claude CLI timed out after {timeout}s"
             result["duration"] = timeout
+            result["timed_out"] = True
             return result
         except FileNotFoundError:
             result["error"] = "Claude CLI not found; ensure 'claude' is on PATH"
@@ -261,7 +300,16 @@ def run_single_eval(case_path: Path, dry_run: bool = False) -> dict[str, Any]:
         result["duration"] = time.monotonic() - start_time
 
         # Write stdout for graders that reference _stdout
-        _write_stdout_file(workdir, proc.stdout or "")
+        stdout_text = proc.stdout or ""
+        _write_stdout_file(workdir, stdout_text)
+        result["stdout_length"] = len(stdout_text)
+
+        # Collect output file sizes
+        output_dir = workdir / "output"
+        if output_dir.exists():
+            for f in output_dir.rglob("*"):
+                if f.is_file():
+                    result["output_file_sizes"][str(f.relative_to(workdir))] = f.stat().st_size
 
         if proc.returncode != 0 and proc.stderr:
             result["error"] = f"Claude CLI exited with code {proc.returncode}: {proc.stderr[:500]}"

@@ -105,17 +105,63 @@ tags:
 | `timeout`                   | no       | Max seconds before the case is marked failed |
 | `tags`                      | no       | Pytest markers applied to the case           |
 
+## Eval Metrics Dimensions
+
+Eval cases measure plugin performance across five dimensions:
+
+| Dimension | What It Measures | Graders Used |
+|---|---|---|
+| **Structural compliance** | Does output follow the output contract? | `section_check`, `markdown_structure` |
+| **Evidence quality** | Are findings sourced? Is evidence separated from inference? | `source_anchor_coverage`, `evidence_labels` |
+| **Systems thinking adherence** | Does output identify feedback loops, compound failures, leverage points? | `section_check`, `forbidden_patterns` |
+| **Analytical completeness** | Did the plugin find specific technical facts from the fixture? | `quantitative_claims` |
+| **Operational** | Did it finish? How long? Did it produce output? | `file_exists`, wall-clock time, stdout length |
+
+### Cloud Interconnect Eval Suite
+
+The `cloud_interconnect_*` eval cases use a realistic fixture (`fixtures/cloud_interconnect_vendor_docs.md`) covering six AWS-to-GCP interconnect options with embedded ground truth facts (pricing, limits, SLAs, preview flags).
+
+```bash
+# Run the full cloud interconnect suite
+.venv/bin/python -m pytest tests/evals/test_evals.py -v -k cloud_interconnect --timeout=600
+
+# Run a single tier
+.venv/bin/python -m pytest tests/evals/test_evals.py::test_eval_case[cloud_interconnect_complexity_basic] -v --timeout=300
+```
+
+**Tiered cases:**
+- **Basic:** `cloud_interconnect_complexity_basic` — does the plugin produce output at all?
+- **Structural:** `cloud_interconnect_complexity_structural` — correct headings, evidence labels, no false confidence
+- **Technical:** `cloud_interconnect_complexity_technical` — extracts specific quantitative facts
+- **Decision brief:** `cloud_interconnect_decision_brief` — two-step workflow produces structured brief
+- **Architecture risk:** `cloud_interconnect_arch_risk_review` — identifies risks, dependencies, failure modes
+
 ## Graders
 
-| Grader        | Behavior                                   | Criteria Format                       |
-| ------------- | ------------------------------------------ | ------------------------------------- |
-| `contains`    | Output must contain all listed substrings  | List of strings                       |
-| `regex`       | Output must match all listed patterns      | List of regex patterns                |
-| `json_schema` | Output must validate against a JSON schema | JSON schema object                    |
-| `llm_judge`   | A second LLM call grades the output        | `{prompt: "...", passing_score: 0.8}` |
-| `custom`      | Runs a Python function you provide         | `{module: "...", function: "..."}`    |
+| Grader | Behavior | Criteria Format |
+|---|---|---|
+| `file_exists` | Expected files exist in workdir | `files: [list of paths]` |
+| `section_check` | File contains required section keywords | `file`, `sections: [list]` |
+| `forbidden_patterns` | File does NOT contain regex patterns | `file`, `patterns: [list]` |
+| `markdown_structure` | Markdown file has required headings | `file`, `headings: [list]` |
+| `source_anchor_coverage` | Fraction of findings with source references | `file`, `min_coverage: 0.5` |
+| `evidence_labels` | Output has evidence and inference labels | `file`, `min_source_labels: 3`, `min_inferred_labels: 1` |
+| `quantitative_claims` | Specific quantitative facts appear in output | `file`, `claims: [{pattern, description}]` |
+| `cross_reference_consistency` | Terms from one section appear in related sections | `file`, `sections_to_cross_check: [[a, b]]`, `min_overlap: 0.3` |
+| `json_schema` | JSON file validates against schema | JSON schema object |
+| `composite` | Aggregates multiple grader results | Auto-applied to all cases |
 
-To add a new grader, implement a function with signature `(output: str, criteria: Any) -> GradeResult` in `tests/evals/graders/` and register it in the grader registry.
+### Adding New Fixtures and Cases
+
+1. Create a fixture file in `tests/evals/fixtures/` with embedded ground truth facts
+2. Create a YAML case file in `tests/evals/cases/` referencing the fixture
+3. Use `setup` steps to copy fixtures into the workdir
+4. Choose graders based on which metric dimensions you want to measure
+5. Set appropriate timeouts (basic: 180s, intermediate: 240s, advanced: 300s)
+
+To add a new grader, implement a function in `tests/evals/graders/` following the pattern:
+`def grade_<name>(filepath: Path, config: dict) -> dict` returning `{"pass": bool, "score": float, ...}`.
+Add the import to `graders/__init__.py` and dispatch branches in both `harness.py` and `test_evals.py`.
 
 ## CI Behavior
 
