@@ -57,6 +57,132 @@ Package extracted findings into a stakeholder-ready **Decision Brief** with evid
 
 Focused risk assessment of a specific architecture — failure modes, hidden dependencies, single points of failure, blast radius, operational survivability. The questions a systems engineer asks before signing off on a design. Produces a **Hidden Risk Summary** with architectural focus.
 
+## How it works
+
+Here's what a typical `/complexity-mapper` session looks like in Claude Code. The same pipeline pattern applies to all workflows — the agents and outputs change, but the rhythm is the same.
+
+### 1. Invoke the skill
+
+```
+You: /complexity-mapper
+
+     We're evaluating a migration from self-managed PostgreSQL to a
+     managed database service. The vendor says it handles replication,
+     failover, and backups automatically. I want to know what they're
+     not telling us before we commit.
+```
+
+You describe what you're evaluating and what concerns you. The skill takes it from there.
+
+### 2. Document indexing (~10 seconds)
+
+Claude invokes the `doc-indexer` agent, which scans your provided materials and maps the structure — headings, sections, high-value areas, caveat-rich zones:
+
+```
+  doc-indexer scanning 4 documents...
+
+  Document: vendor-proposal.md
+    9 sections mapped, 3 flagged as high-value
+    Caveat-rich areas: SLA exclusions (L38), Storage pricing tiers (L97)
+
+  Document: migration-runbook.md
+    6 sections mapped, 2 flagged
+    Gap identified: no rollback procedure documented
+
+  Prioritized Reading List:
+  | Priority | Section                | Recommended Agent              |
+  |----------|------------------------|---------------------------------|
+  | P1       | SLA terms & exclusions | caveat-extractor                |
+  | P1       | Storage & IOPS pricing | cost-capacity-analyst           |
+  | P1       | Failover architecture  | architecture-dependency-mapper  |
+  | P2       | Backup retention       | doc-reader                      |
+```
+
+### 3. Source discovery (when external docs are needed)
+
+If the doc-indexer identifies gaps — vendor quotas not in your files, pricing pages you don't have locally — Claude invokes the `web-researcher` to find them:
+
+```
+  web-researcher discovering sources for 3 topics...
+
+  Source Manifest:
+  | # | Title                    | URL                           | Relevance |
+  |---|--------------------------|-------------------------------|-----------|
+  | 1 | Service Quotas & Limits  | docs.vendor.com/limits/...    | High      |
+  | 2 | IOPS Pricing Calculator  | vendor.com/pricing/...        | High      |
+  | 3 | Known Issues - Failover  | docs.vendor.com/known/...     | High      |
+
+  Gaps: Pricing calculator requires JavaScript (not fully extractable)
+```
+
+Claude presents the Source Manifest for your review before proceeding. You can add or remove sources.
+
+### 4. Dispatch planning (~10 seconds)
+
+The `extraction-planner` looks at the total volume of material and decides how to parallelize the work — how many extraction agents to spawn and what scoped instructions each gets:
+
+```
+  extraction-planner assessing material volume...
+
+  Dispatch Plan:
+  - Total sections: 18
+  - Material volume: Medium
+  - Recommended: 4 extraction agents
+
+  | Agent # | Type                          | Focus Scope                       |
+  |---------|-------------------------------|-----------------------------------|
+  | 1       | caveat-extractor              | SLA exclusions, known limitations |
+  | 2       | caveat-extractor              | Operational constraints, quotas   |
+  | 3       | cost-capacity-analyst         | Storage, IOPS, data transfer      |
+  | 4       | architecture-dependency-mapper | Failover, replication, backups    |
+```
+
+This step prevents the overload that happens when a single agent tries to process too much material at once. Each agent gets bounded, focused instructions.
+
+### 5. Parallel extraction (~30-90 seconds)
+
+Claude launches the extraction agents in parallel. Each one works on its assigned sections and produces findings with source anchors:
+
+```
+  Launching 4 extraction agents in parallel...
+
+  ✓ caveat-extractor (SLA): 14 caveats found (4 critical)
+  ✓ caveat-extractor (ops): 11 caveats found (3 critical)
+  ✓ cost-capacity-analyst: 9 pricing items confirmed, 3 unknown
+  ✓ architecture-dependency-mapper: 8 dependencies, 2 SPOFs identified
+```
+
+### 6. Synthesis (~30-60 seconds)
+
+The `synthesis-brief-writer` combines all extraction outputs into structured artifacts:
+
+```
+Complexity Heat Map
+
+| Area                      | Type       | Likelihood | Impact | Visibility |
+|---------------------------|------------|------------|--------|------------|
+| IOPS throttling at tier boundary | Scaling | High  | High   | Hidden     |
+| Failover window not in SLA      | Quota   | Medium | High   | Hidden     |
+| Cross-region replication lag     | Dependency | High | Medium | Hidden   |
+| Backup restore time undocumented | Operational | High | High | Hidden   |
+
+Top 3 Risks:
+1. SLA excludes maintenance windows — 99.99% uptime doesn't count planned downtime
+2. IOPS pricing jumps 4x at the threshold their sizing tool recommends
+3. "Automatic failover" requires manual DNS update in multi-region configurations
+```
+
+The full output includes source anchors for every finding, severity ratings, unresolved questions, and recommended next steps — ready for a design review or stakeholder conversation.
+
+### What to expect
+
+- **Total time:** 2-5 minutes for a typical analysis, depending on material volume and whether web research is needed
+- **Token usage:** Varies with material size. Small analyses (≤5 sections) use minimal tokens. Larger research across multiple vendors or services will use more.
+- **User interaction:** The skill runs mostly autonomously. You'll be asked to review the Source Manifest (if web research fires) and may be asked clarifying questions if the material is ambiguous.
+- **Output location:** Results are delivered inline in the conversation. Use `/decision-brief` afterward to package findings for stakeholders.
+
+For more worked examples, see `examples/usage-scenarios.md`.
+
 ## Agents
 
 The visible tip of the iceberg is what the vendor shows you. Everything below the waterline is what these agents find.

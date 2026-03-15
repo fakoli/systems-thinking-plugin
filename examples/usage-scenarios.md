@@ -1,6 +1,6 @@
 # Usage Scenarios
 
-Four worked examples showing how to use the systems-thinking-plugin in practice. Each scenario describes the situation, which skill to invoke, what happens under the hood, and what outputs to expect.
+Five worked examples showing how to use the systems-thinking-plugin in practice. Each scenario describes the situation, which skill to invoke, what happens under the hood, and what outputs to expect.
 
 ---
 
@@ -185,6 +185,63 @@ Orient me to this repository. I need to understand:
 
 Start with the top-level structure and go one level deep into each major directory.
 ```
+
+---
+
+## Scenario 5: Platform migration evaluation (full pipeline with web research)
+
+### Situation
+
+Your team is evaluating a migration from a self-managed service to a vendor's managed platform — could be a database, a message queue, a container orchestration platform, or any managed service. The vendor's pitch looks clean, the demo worked, and the pricing page makes sense. But you've been through enough of these to know: the real costs and constraints don't show up until you're committed. You want the full picture before signing anything.
+
+The material doesn't all exist locally — you need the agents to research the vendor's documentation from the web alongside your internal architecture docs.
+
+### Recommended skill
+
+**complexity-mapper** with web research enabled. This exercises the full pipeline: `web-researcher` → `doc-indexer` → `extraction-planner` → parallel extractors → `synthesis-brief-writer`.
+
+### What happens under the hood
+
+1. **doc-indexer** maps any local materials you've provided (vendor proposals, internal architecture docs, migration plans).
+
+2. **web-researcher** discovers external sources — the vendor's quota pages, pricing calculators, SLA documents, known issues pages, community forums with production war stories. Produces a **Source Manifest** listing every source found, with relevance ratings and gaps (e.g., "pricing calculator requires JavaScript — not fully extractable").
+
+3. **extraction-planner** assesses the total volume — 20+ sections across vendor docs and internal materials — and produces a **Dispatch Plan**: "spawn 3 caveat-extractors (platform limits, operational constraints, migration risks), 1 cost-capacity-analyst, 1 architecture-dependency-mapper." Each agent gets scoped instructions specifying exactly which sections to read and what to focus on.
+
+4. Extraction agents run in parallel (~60-90 seconds). Each produces findings with source anchors:
+   - Caveat-extractors surface hard limits buried in quota tables, SLA exclusions that carve out the scenarios you care about most, behavioral differences between the managed version and what you're running today, and migration constraints the vendor's sales team didn't mention.
+   - Cost-capacity-analyst confirms base pricing and flags hidden multipliers — the per-operation fees that compound at your scale, the data transfer costs between components, the premium tier you'll need for the features the demo showed.
+   - Architecture-dependency-mapper identifies what breaks if the managed service goes down, what new dependencies you're inheriting, and where your rollback path has gaps.
+
+5. **synthesis-brief-writer** combines all findings into a **Complexity Heat Map** and **Hidden Risk Summary**, cross-referencing across agents to surface compound risks — the places where two individually manageable constraints combine into a serious problem.
+
+### Expected outputs
+
+- **Source Manifest** — catalog of all web and local sources discovered
+- **Dispatch Plan** — how extraction was parallelized and why
+- **Context Packets** — raw findings per extraction agent with source anchors
+- **Complexity Heat Map** — ranked complexity areas (quotas, cost traps, dependencies, scaling cliffs)
+- **Hidden Risk Summary** — top risks with evidence, compound failure scenarios, unresolved questions
+- Optionally, feed everything into **decision-brief** for a stakeholder-ready package
+
+### How to invoke
+
+```
+/complexity-mapper
+
+We're evaluating migrating from self-managed PostgreSQL to [Vendor]'s
+managed database platform. Analyze their documentation for hidden risks.
+
+Internal docs: reference/vendor_docs/vendor-proposal.md
+Architecture: reference/previous_designs/current-db-architecture.md
+
+Focus on: SLA exclusions, pricing at our scale (2TB, 50K IOPS),
+failover behavior, backup/restore guarantees, and migration risks.
+```
+
+### What makes this scenario different
+
+This is the full pipeline — web research, dispatch planning, parallel extraction, and synthesis all working together. The key insight is that the extraction-planner prevents the overload that would happen if a single caveat-extractor tried to process 20+ sections of vendor documentation at once. By scoping each agent to a specific topic area and bounded set of sections, the extraction stays fast and focused.
 
 ---
 
