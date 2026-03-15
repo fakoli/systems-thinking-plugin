@@ -12,7 +12,7 @@ _SOURCE_PATTERNS = [
     re.compile(r"\((?:see|from|per|ref)\b", re.IGNORECASE),
     re.compile(r"§\s*\w"),
     re.compile(r"\bAppendix\s+[A-Z]", re.IGNORECASE),
-    re.compile(r"\bOption\s+\d", re.IGNORECASE),
+    re.compile(r"\b(?:see|per|ref)\s+Option\s+\d", re.IGNORECASE),
 ]
 
 # Patterns that identify a finding/claim line (bullet point or table row with substance)
