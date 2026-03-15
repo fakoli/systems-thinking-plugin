@@ -1,11 +1,12 @@
 ---
 name: Context Sharding
-description: Split large or varied source material across parallel subagents for extraction before synthesis.
-trigger:
-  - keyword: shard
-  - keyword: split documents
-  - keyword: parallel extraction
-  - condition: Source material is too large or too varied for a single clean reasoning session.
+description: >
+  Split large or varied source material across parallel subagents for extraction before synthesis.
+  Use this when documentation exceeds what can be processed in a single pass — typically more than
+  5 dense documents or 50+ pages — or when material spans multiple distinct domains. Produces
+  structured Context Packets that can feed into complexity-mapper, decision-brief, or
+  architecture-risk-review. Ask to "shard documents", "split for parallel extraction", or
+  "break this into digestible chunks" to use this workflow.
 ---
 
 # Context Sharding
@@ -35,11 +36,23 @@ Do **not** use Context Sharding when:
 
 ## Process Steps
 
+### Step 0.5: Conditionally Invoke web-researcher for External Sources
+
+If the extraction goal involves topics that require web research (e.g., vendor documentation, pricing, service limits not available locally):
+
+1. Invoke the `web-researcher` agent to discover and collect relevant source material.
+2. Present the Source Manifest to the user for review.
+3. Include approved web sources alongside local materials as input for doc-indexer in Step 1.
+
+Web-sourced material should be treated as separate shard candidates from local material to maintain source clarity.
+
+**Skip this step** if all material is already available locally.
+
 ### Step 1: Invoke doc-indexer to Map All Provided Materials
 
 When inventorying materials to shard, also check `reference/vendor_docs/` and `reference/previous_designs/` for files relevant to the extraction goal. Include relevant reference materials as additional input sources.
 
-Run the `doc-indexer` agent on the full set of provided materials. The doc-indexer produces:
+Run the `doc-indexer` agent on the full set of provided materials (including any web-sourced material from Step 0.5). The doc-indexer produces:
 
 - A complete inventory of all documents/files with size, type, and topic classification.
 - A structural map showing how documents relate to each other (cross-references, shared topics, dependency chains).
@@ -92,11 +105,20 @@ All doc-reader instances run in parallel. Each produces a Context Packet contain
 - Flags for out-of-shard references that may need cross-referencing.
 - Confidence ratings on extracted items.
 
+### Step 3.5: Optionally Invoke extraction-planner for Caveat Extraction
+
+If the extraction goal includes risk identification, limitation discovery, or the downstream workflow is complexity-mapper or architecture-risk-review, and the per-shard material volume is large (>5 sections per shard):
+
+1. Run the `extraction-planner` on each shard to determine how many caveat-extractors to spawn per shard and what scoped instructions each receives.
+2. Use the Dispatch Plan to launch targeted caveat-extractors.
+
+**Skip this step** if per-shard material is small (≤5 sections) — use a single caveat-extractor per shard.
+
 ### Step 4: Optionally Run caveat-extractor on Each Shard
 
 If the extraction goal includes risk identification, limitation discovery, or the downstream workflow is complexity-mapper or architecture-risk-review:
 
-- Run `caveat-extractor` on each shard's raw material (not on the Context Packet — on the original source).
+- Following the Dispatch Plan from Step 3.5 (or one caveat-extractor per shard if Step 3.5 was skipped), run `caveat-extractor` on each shard's raw material (not on the Context Packet — on the original source).
 - Append caveat extraction results to the corresponding Context Packet.
 
 This step adds depth but also adds processing time. Skip it if the extraction goal is purely informational (e.g., summarization, inventory).

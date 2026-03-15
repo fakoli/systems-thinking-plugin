@@ -1,11 +1,12 @@
 ---
 name: Pattern Remix
-description: Generate high-quality first drafts by adapting prior proven work to new problems.
-trigger:
-  - keyword: remix
-  - keyword: adapt prior
-  - keyword: first draft from existing
-  - condition: User has prior successful designs and needs a strong starting point for a new but related problem.
+description: >
+  Generate high-quality first drafts by adapting prior proven work to new problems. Use this when
+  you have successful prior designs, implementations, or architectural patterns and need a strong
+  starting point for a new but related problem. Produces a Pattern Remix Draft that maps reused
+  elements to their sources, flags carried assumptions, identifies divergence risks, and provides
+  implementation steps. Ask to "remix a prior design", "adapt existing work", or "create a first
+  draft from prior patterns" to use this workflow.
 ---
 
 # Pattern Remix
@@ -39,10 +40,9 @@ Do **not** use Pattern Remix when:
 
 Collect all prior artifacts that may be structurally relevant to the new problem. Check the following sources in order:
 
-1. `reference/previous_designs/` directory for indexed prior work.
-2. `reference/previous_designs/` directory for additional prior designs, proposals, and architecture notes.
-3. User-specified file paths or repositories.
-4. Context Packets from prior workflow runs that contain relevant design extractions.
+1. `reference/previous_designs/` directory for indexed prior work, proposals, and architecture notes.
+2. User-specified file paths or repositories.
+3. Context Packets from prior workflow runs that contain relevant design extractions.
 
 When scanning `reference/previous_designs/`, present any found materials to the user for selection before proceeding — not all prior work will be relevant to the current remix.
 

@@ -5,7 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "command -v uv > /dev/null 2>&1 || echo 'WARNING: uv is not installed. This plugin requires uv for dependency management. Run: curl -LsSf https://astral.sh/uv/install.sh | sh'; command -v jq > /dev/null 2>&1 || echo 'WARNING: jq is not installed. Hook scripts require jq for JSON parsing. Install with: brew install jq'"
+            "command": "command -v uv > /dev/null 2>&1 || echo 'WARNING: uv is not installed. This plugin requires uv for dependency management. Run: curl -LsSf https://astral.sh/uv/install.sh | sh'; command -v jq > /dev/null 2>&1 || echo 'WARNING: jq is not installed. Hook scripts require jq for JSON parsing. Install with: brew install jq'",
+            "timeout": 5
           }
         ]
       }

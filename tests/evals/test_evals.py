@@ -6,16 +6,23 @@ and ``@pytest.mark.slow`` so they can be selected or excluded via pytest
 markers.
 
 Usage:
-    pytest tests/evals/test_evals.py -v
+    pytest tests/evals/test_evals.py -v -m slow
     pytest tests/evals/test_evals.py -v -m eval
-    pytest tests/evals/test_evals.py -v -k complexity_mapper
+    pytest tests/evals/test_evals.py -v -k complexity_mapper -m slow
+
+Output and cost tracking:
+    Eval outputs are saved to tests/evals/results/<case_name>/ so you can
+    inspect what Claude produced. Each run also captures token usage from
+    the Claude CLI's --output-format json mode.
 """
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -37,6 +44,11 @@ from tests.evals.graders.source_anchor_coverage import grade_source_anchor_cover
 HARNESS_DIR = Path(__file__).resolve().parent
 CASES_DIR = HARNESS_DIR / "cases"
 FIXTURES_DIR = HARNESS_DIR / "fixtures"
+RESULTS_DIR = HARNESS_DIR / "results"
+
+# Approximate cost per token (Claude Sonnet 4, as of March 2026)
+_INPUT_COST_PER_TOKEN = 3.0 / 1_000_000   # $3 per 1M input tokens
+_OUTPUT_COST_PER_TOKEN = 15.0 / 1_000_000  # $15 per 1M output tokens
 
 
 def _discover_case_files() -> list[Path]:
@@ -146,6 +158,68 @@ _case_files = _discover_case_files()
 _case_ids = [p.stem for p in _case_files]
 
 
+def _save_results(case_name: str, workdir: Path, proc_result: dict) -> Path:
+    """Copy eval outputs to a persistent results directory for inspection.
+
+    Returns the results directory path.
+    """
+    result_dir = RESULTS_DIR / case_name
+    if result_dir.exists():
+        shutil.rmtree(result_dir)
+    result_dir.mkdir(parents=True, exist_ok=True)
+
+    # Copy all output files
+    output_dir = workdir / "output"
+    if output_dir.exists():
+        shutil.copytree(output_dir, result_dir / "output", dirs_exist_ok=True)
+
+    # Copy stdout
+    stdout_path = workdir / "_stdout"
+    if stdout_path.exists():
+        shutil.copy2(stdout_path, result_dir / "_stdout.txt")
+
+    # Write run metadata (timing, tokens, cost)
+    meta_path = result_dir / "_meta.json"
+    meta_path.write_text(json.dumps(proc_result, indent=2, default=str), encoding="utf-8")
+
+    return result_dir
+
+
+def _parse_usage_from_stderr(stderr: str) -> dict:
+    """Extract token usage from Claude CLI stderr output.
+
+    The Claude CLI prints usage info to stderr. Look for patterns like:
+      Total input tokens: 12345
+      Total output tokens: 6789
+    or JSON-formatted usage blocks.
+    """
+    usage = {"input_tokens": 0, "output_tokens": 0, "cost_estimate": 0.0}
+
+    for line in stderr.splitlines():
+        line_lower = line.strip().lower()
+        if "input" in line_lower and "token" in line_lower:
+            # Try to extract number
+            parts = line.strip().split()
+            for part in parts:
+                part_clean = part.replace(",", "").replace(".", "")
+                if part_clean.isdigit():
+                    usage["input_tokens"] = int(part_clean)
+                    break
+        elif "output" in line_lower and "token" in line_lower:
+            parts = line.strip().split()
+            for part in parts:
+                part_clean = part.replace(",", "").replace(".", "")
+                if part_clean.isdigit():
+                    usage["output_tokens"] = int(part_clean)
+                    break
+
+    usage["cost_estimate"] = (
+        usage["input_tokens"] * _INPUT_COST_PER_TOKEN
+        + usage["output_tokens"] * _OUTPUT_COST_PER_TOKEN
+    )
+    return usage
+
+
 @pytest.mark.eval
 @pytest.mark.slow
 @pytest.mark.parametrize("case_path", _case_files, ids=_case_ids)
@@ -156,6 +230,9 @@ def test_eval_case(case_path: Path) -> None:
     Claude CLI with the case prompt, and runs all configured graders against
     the output.
 
+    Outputs are saved to tests/evals/results/<case_name>/ for inspection.
+    Token usage and cost estimates are printed to stdout.
+
     The test is automatically skipped if the ``claude`` CLI is not found on
     PATH.
     """
@@ -163,12 +240,15 @@ def test_eval_case(case_path: Path) -> None:
         pytest.skip("Claude CLI not available on PATH")
 
     case = _load_case(case_path)
-    workdir = Path(tempfile.mkdtemp(prefix=f"eval_{case['name']}_"))
+    case_name = case["name"]
+    workdir = Path(tempfile.mkdtemp(prefix=f"eval_{case_name}_"))
 
     try:
         _run_setup(case, workdir)
 
         timeout = case.get("timeout", 120)
+        start_time = time.monotonic()
+
         proc = subprocess.run(
             [
                 "claude",
@@ -183,12 +263,54 @@ def test_eval_case(case_path: Path) -> None:
             timeout=timeout,
         )
 
+        duration = time.monotonic() - start_time
+
         # Write stdout for graders referencing _stdout
         stdout_path = workdir / "_stdout"
         stdout_path.write_text(proc.stdout or "", encoding="utf-8")
 
+        # Parse token usage from stderr
+        usage = _parse_usage_from_stderr(proc.stderr or "")
+
+        # Run graders
         grader_results = _run_graders(case, workdir)
         composite = grade_composite(grader_results)
+
+        # Build result metadata
+        proc_result = {
+            "case": case_name,
+            "duration_seconds": round(duration, 1),
+            "exit_code": proc.returncode,
+            "stdout_length": len(proc.stdout or ""),
+            "stderr_length": len(proc.stderr or ""),
+            "input_tokens": usage["input_tokens"],
+            "output_tokens": usage["output_tokens"],
+            "cost_estimate_usd": round(usage["cost_estimate"], 4),
+            "grader_pass": composite["pass"],
+            "grader_score": composite["score"],
+            "passed_checks": composite["passed_checks"],
+            "total_checks": composite["total_checks"],
+        }
+
+        # Save outputs for inspection (always, pass or fail)
+        result_dir = _save_results(case_name, workdir, proc_result)
+
+        # Print visible summary to pytest output
+        print(f"\n  --- Eval: {case_name} ---")
+        print(f"  Duration:      {duration:.1f}s")
+        print(f"  Input tokens:  {usage['input_tokens']:,}")
+        print(f"  Output tokens: {usage['output_tokens']:,}")
+        print(f"  Est. cost:     ${usage['cost_estimate']:.4f}")
+        print(f"  Checks:        {composite['passed_checks']}/{composite['total_checks']} passed")
+        print(f"  Output saved:  {result_dir}")
+
+        if proc.stderr:
+            # Print last 5 lines of stderr for visibility
+            stderr_lines = proc.stderr.strip().splitlines()
+            if stderr_lines:
+                print(f"  Stderr (last 5 lines):")
+                for line in stderr_lines[-5:]:
+                    print(f"    {line}")
 
         if not composite["pass"]:
             failure_details: list[str] = []
@@ -196,10 +318,16 @@ def test_eval_case(case_path: Path) -> None:
                 failure_details.append(str(failed))
             detail_str = "\n".join(failure_details)
             pytest.fail(
-                f"Eval '{case['name']}' failed "
+                f"Eval '{case_name}' failed "
                 f"({composite['passed_checks']}/{composite['total_checks']} checks passed).\n"
-                f"Failures:\n{detail_str}"
+                f"Failures:\n{detail_str}\n"
+                f"Full output saved to: {result_dir}"
             )
+
+    except subprocess.TimeoutExpired:
+        print(f"\n  --- Eval: {case_name} ---")
+        print(f"  TIMED OUT after {timeout}s")
+        pytest.fail(f"Eval '{case_name}' timed out after {timeout}s")
 
     finally:
         shutil.rmtree(workdir, ignore_errors=True)

@@ -1,11 +1,12 @@
 ---
 name: Decision Brief
-description: Package extracted findings into a compact, decision-ready format for engineers, managers, or review bodies.
-trigger:
-  - keyword: decision brief
-  - keyword: decision package
-  - keyword: summarize for decision
-  - condition: Findings from extraction or analysis need to be presented for a decision.
+description: >
+  Package extracted findings into a compact, decision-ready format for engineers, managers, or
+  review bodies. Use this after running complexity-mapper, architecture-risk-review, or
+  context-sharding to synthesize findings into a structured brief with options, evidence, risks,
+  and recommended next steps. Produces a Decision Brief with evidence summary, top risks,
+  unresolved questions, and actionable recommendations. Ask for a "decision brief",
+  "decision package", or "summarize findings for a decision" to use this workflow.
 ---
 
 # Decision Brief
@@ -45,6 +46,8 @@ Collect all available outputs from prior workflow runs or direct input:
 - Complexity Heat Maps and Hidden Risk Summaries from `complexity-mapper`
 - Risk assessments from `architecture-risk-review`
 - Pattern Remix Drafts from `pattern-remix`
+- Source Manifests from `web-researcher` (if web research was performed upstream)
+- Dispatch Plans from `extraction-planner` (for understanding how extraction was parallelized)
 - Any direct analysis notes, findings, or data provided by the user
 
 For each input, verify:

@@ -21,7 +21,12 @@ SYNTHESIS_AGENTS = [
     "synthesis-brief-writer.md",
 ]
 
-ALL_AGENTS = EXTRACTION_AGENTS + SYNTHESIS_AGENTS
+ORCHESTRATION_AGENTS = [
+    "web-researcher.md",
+    "extraction-planner.md",
+]
+
+ALL_AGENTS = EXTRACTION_AGENTS + SYNTHESIS_AGENTS + ORCHESTRATION_AGENTS
 
 VALID_TOOLS = {
     "Read",
@@ -117,3 +122,15 @@ def test_allowed_tools_are_valid(filename):
     tools = fm.get(tools_key, [])
     invalid = [t for t in tools if t not in VALID_TOOLS]
     assert not invalid, f"{filename} has invalid tools: {invalid}. Allowed: {VALID_TOOLS}"
+
+
+# ── Orchestration agent contracts ──────────────────────────────────
+
+
+@pytest.mark.parametrize("filename", ORCHESTRATION_AGENTS)
+def test_orchestration_agents_mention_downstream(filename):
+    """Orchestration agents should reference downstream agents or workflows."""
+    body = _read_body(filename).lower()
+    keywords = ["downstream", "dispatch", "manifest", "plan"]
+    found = [kw for kw in keywords if kw in body]
+    assert found, f"{filename} should mention at least one of: {keywords}"

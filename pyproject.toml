@@ -29,4 +29,4 @@ markers = [
     "eval: marks tests as eval tests (may require claude CLI)",
     "slow: marks tests as slow-running",
 ]
-addopts = "-v --tb=short"
+addopts = "-v --tb=short -m 'not slow'"

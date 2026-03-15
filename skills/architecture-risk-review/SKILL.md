@@ -1,11 +1,13 @@
 ---
 name: Architecture Risk Review
-description: Targeted review of failure modes, hidden dependencies, limits, and operational burden in an architecture.
-trigger:
-  - keyword: architecture risk
-  - keyword: risk review
-  - keyword: failure mode analysis
-  - condition: A focused risk assessment of a specific architecture or design is needed without running a full complexity mapping.
+description: >
+  Targeted review of failure modes, hidden dependencies, limits, and operational burden in a
+  specific architecture or design. Use this when you need a focused risk assessment without
+  running a full complexity mapping — to identify single points of failure, blast radius concerns,
+  hidden coupling, and operational survivability gaps. Produces a Hidden Risk Summary with
+  dependency risk matrix, compound failure scenarios, and prioritized remediation actions.
+  Ask for an "architecture risk review", "failure mode analysis", or "dependency risk assessment"
+  to use this workflow.
 ---
 
 # Architecture Risk Review
@@ -55,9 +57,25 @@ Run the `doc-indexer` agent on all provided architecture documents to produce:
 
 Undocumented areas are themselves a risk signal. Log them for inclusion in the final output.
 
+### Step 1.5: Conditionally Invoke web-researcher for External Sources
+
+If the architecture depends on external services, cloud platforms, or vendor products whose documentation is not available locally:
+
+1. Invoke the `web-researcher` agent to discover relevant vendor documentation (service quotas, SLAs, known issues, pricing).
+2. Present the Source Manifest to the user for review before proceeding.
+3. Feed approved sources into doc-indexer for structural mapping.
+
+**Skip this step** if all vendor documentation is already available in `reference/vendor_docs/` or provided by the user.
+
+### Step 1.75: Invoke extraction-planner for Dispatch Planning
+
+If the doc-indexer output identifies more than 5 sections for extraction, run the `extraction-planner` agent to produce a Dispatch Plan. This determines how many caveat-extractors and dependency-mappers to spawn and what scoped instructions each receives.
+
+**Skip this step** if the doc-indexer identifies ≤5 architecture-relevant sections. Use a single caveat-extractor and single architecture-dependency-mapper.
+
 ### Step 2: Run caveat-extractor on Architecture-Relevant Sections
 
-Run the `caveat-extractor` agent on sections identified by the doc-indexer as architecture-relevant:
+Following the Dispatch Plan (or default single-extractor if Step 1.75 was skipped), run the `caveat-extractor` agent(s) on sections identified by the doc-indexer as architecture-relevant:
 
 **Extraction targets:**
 

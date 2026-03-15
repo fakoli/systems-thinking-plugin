@@ -1,11 +1,12 @@
 ---
 name: Complexity Mapper
-description: Surface hidden complexity, risks, dependencies, and likely project blow-up points in a proposed design or architecture.
-trigger:
-  - keyword: complexity map
-  - keyword: hidden risks
-  - keyword: blow-up points
-  - condition: A design looks viable on paper but may hide operational, networking, cost, or implementation complexity.
+description: >
+  Surface hidden complexity, risks, dependencies, and likely project blow-up points in a proposed
+  design or architecture. Use this when you have architecture docs, design proposals, or technical
+  specs and need to identify where operational, cost, networking, or implementation complexity is
+  hiding before committing resources. Produces a Complexity Heat Map and Hidden Risk Summary with
+  source-anchored evidence and severity ratings. Ask for a "complexity map", "hidden risk analysis",
+  "blow-up point review", or "complexity audit" to trigger this workflow.
 ---
 
 # Complexity Mapper
@@ -48,9 +49,33 @@ Run the `doc-indexer` agent on all provided documentation to produce a structura
 
 The doc-indexer output serves as the routing table for Step 2. If the doc-indexer identifies significant gaps in the documentation, flag these immediately — they are themselves a complexity signal.
 
-### Step 2: Assign Sections to Parallel Extraction Agents
+### Step 1.5: Conditionally Invoke web-researcher for External Sources
 
-Based on the doc-indexer output, route sections to three specialized extraction agents running in parallel:
+If the analysis requires external documentation (vendor docs, pricing pages, service quotas) that is not available locally, or if the doc-indexer identifies gaps that need external sources:
+
+1. Invoke the `web-researcher` agent with the specific topics or documentation gaps to research.
+2. The web-researcher produces a **Source Manifest** listing discovered URLs, document locations, and sections of interest.
+3. Present the Source Manifest to the user for review before proceeding — the user may want to add, remove, or reprioritize sources.
+4. Feed approved sources back into doc-indexer for structural mapping, or pass them directly to the extraction-planner in Step 2.
+
+**Skip this step** if all necessary material is already available locally or has been provided by the user.
+
+### Step 2: Invoke extraction-planner for Dispatch Planning
+
+Run the `extraction-planner` agent with the doc-indexer output (and any web-researcher Source Manifest from Step 1.5). The extraction-planner:
+
+1. Assesses the total volume and complexity of material (section count, page count, topic diversity).
+2. Determines how many extraction agents to spawn and of which types.
+3. Writes specific, scoped instructions for each extractor — what sections to read, what to focus on, what to skip.
+4. Produces a **Dispatch Plan** specifying agent assignments.
+
+This step prevents extractor overload. Instead of one massive extraction prompt, each agent receives bounded, focused instructions.
+
+**Skip this step** if the doc-indexer identifies ≤5 total sections. In that case, proceed directly to Step 3 with a single extractor per type.
+
+### Step 3: Launch Extraction Agents Per the Dispatch Plan
+
+Following the Dispatch Plan from Step 2 (or using default single-extractor-per-type if Step 2 was skipped), launch the extraction agents in parallel:
 
 **Agent A — caveat-extractor**
 
@@ -70,7 +95,7 @@ Based on the doc-indexer output, route sections to three specialized extraction 
 - Instruction: Map every dependency with its ownership (internal team, external vendor, open source), SLA, failure mode, and blast radius. Identify single points of failure, circular dependencies, and components where the dependency chain is deeper than two levels.
 - Pay special attention to: shared infrastructure that multiple components assume is always available, implicit ordering dependencies, and services owned by teams outside the project's control.
 
-### Step 3: Collect Extraction Outputs
+### Step 4: Collect Extraction Outputs
 
 Gather outputs from all three extraction agents. For each output:
 
@@ -78,7 +103,7 @@ Gather outputs from all three extraction agents. For each output:
 - Check for contradictions between agents (e.g., cost-capacity-analyst assumes a scaling path that caveat-extractor has flagged as limited).
 - Note any sections that no agent covered — these may indicate documentation gaps or areas that don't fit neatly into one extraction category.
 
-### Step 4: Invoke synthesis-brief-writer
+### Step 5: Invoke synthesis-brief-writer
 
 Pass all three extraction outputs plus the original design assumptions and constraints to the `synthesis-brief-writer` agent with instructions to produce:
 
@@ -95,7 +120,7 @@ Pass all three extraction outputs plus the original design assumptions and const
 - Which design assumptions it threatens.
 - Recommended investigation or mitigation.
 
-### Step 5: Present Findings to User
+### Step 6: Present Findings to User
 
 After synthesis, compare the output format and depth against any examples in `reference/examples/` to ensure consistency with established quality standards.
 
