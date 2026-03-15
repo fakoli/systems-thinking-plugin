@@ -5,6 +5,32 @@ All notable changes to the systems-thinking-plugin will be documented in this fi
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-03-14
+
+### Fixed
+
+- **Stop hook false positives:** Quality gate no longer triggers on casual mentions of plugin names — now matches only actual agent/skill invocations in the transcript
+- **UserPromptSubmit false positives:** Converted from static prompt hook (fired every message) to command-based gate that only injects the reminder when a systems-thinking skill is explicitly invoked via slash command or an active workflow exists in the transcript
+- **Hook keyword duplication:** Extracted shared `discover-components.sh` so both hooks derive skill/agent lists from the directory structure at runtime — no hardcoded lists to drift out of sync
+
+### Added
+
+- `hooks/user-prompt-gate.sh` — scoped prompt injection, only activates on slash-command invocations or active transcript workflows
+- `hooks/discover-components.sh` — shared component discovery sourced by both hook scripts; auto-detects new skills and agents
+
+## [0.1.2] - 2026-03-13
+
+### Fixed
+
+- **stop-quality-gate.sh reliability:** Grep transcript file directly instead of loading into a shell variable (avoids `ARG_MAX` failures on large transcripts); dropped `set -e` to prevent silent early exits on `grep || fallback` patterns
+
+## [0.1.1] - 2026-03-12
+
+### Fixed
+
+- **Stop hook scope:** Scoped Stop hook to only fire when systems-thinking components are present in the session transcript
+- **Hook prompt errors:** Rewrote Stop hook from prompt type to command type to prevent file-access errors during hook execution
+
 ## [0.1.0] - 2026-03-11
 
 ### Added
