@@ -148,6 +148,32 @@ def test_gate_script_checks_systems_thinking_patterns(gate_script_path):
     assert "architecture-dependency-mapper" in content or "caveat-extractor" in content
 
 
+def test_gate_script_does_not_use_set_e(gate_script_path):
+    """Gate script must not use 'set -e' or 'set -euo' — it kills grep || fallbacks."""
+    content = gate_script_path.read_text()
+    # Check for set -e, set -euo, set -eo, etc. (any set that includes -e)
+    import re
+    # Match 'set' followed by flags that include 'e'
+    assert not re.search(r'\bset\s+-\w*e\w*\b', content), (
+        "Gate script must not use 'set -e' — grep non-zero exits kill the script "
+        "before the '|| missing=...' fallback can execute"
+    )
+
+
+def test_gate_script_greps_file_directly(gate_script_path):
+    """Gate script must grep the transcript file directly, not load into a variable.
+
+    Loading a large JSONL transcript into a shell variable via $(cat ...) fails
+    silently when the file exceeds ARG_MAX or contains problematic characters.
+    """
+    content = gate_script_path.read_text()
+    # Should NOT have: transcript=$(cat "$transcript_path") followed by echo "$transcript" | grep
+    assert 'transcript=$(cat' not in content, (
+        "Gate script must not load transcript into a variable — "
+        "grep the file directly to handle large transcripts"
+    )
+
+
 # ── Quality constraints ──────────────────────────────────────────────────────
 
 

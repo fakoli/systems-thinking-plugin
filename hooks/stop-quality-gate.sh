@@ -7,7 +7,7 @@
 # Exit 0 = approve (no quality check needed)
 # Exit 2 + stderr = block (quality sections missing)
 
-set -euo pipefail
+set -uo pipefail
 
 input=$(cat)
 transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
@@ -27,13 +27,13 @@ if ! grep -qiE "$PATTERNS" "$transcript_path" 2>/dev/null; then
 fi
 
 # Systems-thinking was used — check for required quality sections
-transcript=$(cat "$transcript_path")
-
+# Grep the file directly instead of loading into a variable
+# (avoids failures with large transcripts or paths with special characters)
 missing=""
-echo "$transcript" | grep -qi "assumption" || missing="${missing}assumptions, "
-echo "$transcript" | grep -qi "risk" || missing="${missing}risks, "
-echo "$transcript" | grep -qi "unresolved" || missing="${missing}unresolved questions, "
-echo "$transcript" | grep -qi "next step\|next check\|recommended" || missing="${missing}next steps, "
+grep -qi "assumption" "$transcript_path" 2>/dev/null || missing="${missing}assumptions, "
+grep -qi "risk" "$transcript_path" 2>/dev/null || missing="${missing}risks, "
+grep -qi "unresolved" "$transcript_path" 2>/dev/null || missing="${missing}unresolved questions, "
+grep -qiE "next step|next check|recommended" "$transcript_path" 2>/dev/null || missing="${missing}next steps, "
 
 if [ -n "$missing" ]; then
   missing="${missing%, }"  # trim trailing comma
