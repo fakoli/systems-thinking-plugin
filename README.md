@@ -8,18 +8,20 @@ A Claude Code plugin that applies systems thinking to infrastructure and archite
 
 ## Why this exists
 
-After 25 years of building and operating infrastructure — networking, cloud engineering, storage, system administration, OS provisioning, and system programming — the pattern is always the same: first you get the rosy part, because that's what sells it. The vendor demo works. The POC looks clean. The pricing page makes sense. Then you commit, and you discover what was below the waterline the whole time — the quotas that bite at scale, the cost mechanics that compound non-linearly, the dependencies between services that nobody mapped, the caveats buried in page 47 of the docs.
+Systems engineers think differently. Whether the problem is a network design, a cloud migration, a storage architecture, or a vendor evaluation — the discipline is the same: understand what a system does well, understand what it *doesn't* do well, and build pathways to close the gap before you're in production wondering why nobody told you.
 
-This is the iceberg problem. The visible tip is what gets sold. The massive hidden mass below is what you actually have to operate. And if you've worked with enough contractors and consulting agencies, you've seen the other side of it too — the game of hooking you in and figuring out the rest on the way, as your money drains into problems that could have been surfaced upfront.
+The pattern repeats across every technology and every era. First you get the rosy part, because that's what sells it. The vendor demo works. The POC looks clean. The pricing page makes sense. Then you commit, and you discover what was below the waterline the whole time — the quotas that bite at scale, the cost mechanics that compound non-linearly, the dependencies between services that nobody mapped, the caveats buried in page 47 of the docs.
 
-This plugin encodes the discipline of looking below the waterline before you commit:
+This is the iceberg problem. The visible tip is what gets sold. The massive hidden mass below is what you actually have to operate. A systems engineer's job has always been to look below that waterline — to ask the questions that the sales pitch doesn't invite, to read the docs that the POC doesn't exercise, to map the dependencies that only matter when something fails. Whether you're evaluating a new cloud service, planning a multi-region architecture, designing a storage tier, or provisioning an OS at scale — the methodology is the same.
+
+This plugin encodes that methodology into reusable workflows:
 
 - **Extract before you synthesize.** Separate the work of gathering what a source *actually says* from the work of interpreting it. Extraction agents pull out every technical claim, limitation, cost mechanic, and dependency — faithfully, with source anchors. It's the difference between "what the vendor's doc claims" and "what you'll actually pay for." Synthesis agents connect those findings into decisions only after extraction is complete.
 - **Preserve what you find.** Every finding traces back to a specific file, section, or page. Not "broadly available" when it says "us-east-1 only." Not "supports X" when the doc says "supports X when Y is also true." No collapsed nuance. The caveats are where the real decisions live.
 - **Reuse what worked.** Prior designs, architecture decisions, and proven patterns are first-class inputs. The plugin adapts them to new constraints rather than starting from scratch, while flagging where the old context no longer applies. Lessons that got lost in the last vendor's sales pitch get carried forward.
 - **Produce artifacts that travel.** Outputs follow structured contracts (Decision Briefs, Risk Summaries, Complexity Heat Maps) designed for design reviews, stakeholder conversations, and handoffs — not confident guesses dressed up as analysis.
 
-Understanding what systems *don't* do well is as important as what they do well. This plugin builds different pathways to find those gaps and augment systems so you can actually build and scale them. See `docs/systems-thinking-foundations.md` for the full conceptual mapping.
+Understanding what systems *don't* do well is as important as understanding what they do well. This plugin builds the discipline of looking below the waterline into reusable workflows — so the gaps surface before you've committed, not after. See `docs/systems-thinking-foundations.md` for the full conceptual mapping.
 
 ## Install
 
@@ -33,27 +35,27 @@ The setup script checks for `uv`, `python3`, `tmux` (optional), and the `claude`
 
 ## Workflows
 
-The plugin provides five slash-command skills, each orchestrating a set of focused subagents.
+Five workflows, each modeling a different phase of how a systems engineer navigates a problem:
 
 ### `/complexity-mapper`
 
-Surface hidden implementation complexity, cost traps, and architectural risks. Runs extraction agents (caveat-extractor, cost-capacity-analyst, architecture-dependency-mapper) in parallel, then synthesizes findings into a **Complexity Heat Map** and **Hidden Risk Summary**.
+The full below-the-waterline scan. When you have a design, a vendor proposal, or an architecture doc and you need to know where complexity is hiding — cost traps, scaling cliffs, dependency chains, operational burden that isn't in the pitch deck. Runs extraction agents in parallel, then synthesizes findings into a **Complexity Heat Map** and **Hidden Risk Summary**.
 
 ### `/context-sharding`
 
-Break large or varied source material (vendor packages, sprawling repos, multi-document specs) into focused chunks. Extraction agents process each chunk independently, producing **Context Packets** with findings, caveats, and source anchors. Prevents early-impression bias from a single-pass read.
+When the material is too large for a single pass — vendor doc packages, sprawling repos, multi-service specs. A systems engineer doesn't read 200 pages linearly and hope to catch everything. This workflow breaks material into focused chunks, extracts independently from each, and catches what a single-pass read would miss. Produces **Context Packets** with findings, caveats, and source anchors.
 
 ### `/pattern-remix`
 
-Adapt prior proven work to a new problem. Provide a known-good design and a set of new constraints to get a **Pattern Remix Draft** identifying what transfers, what needs adaptation, and what risks the adaptation introduces.
+Systems engineers don't start from scratch when a proven pattern exists. This workflow takes a known-good design and adapts it to new constraints — mapping what transfers, what needs to change, and what assumptions from the old context no longer hold. Produces a **Pattern Remix Draft** with source tracing and divergence risks.
 
 ### `/decision-brief`
 
-Package extracted findings into a stakeholder-ready **Decision Brief** with evidence, options, risks, and next steps.
+Package extracted findings into a stakeholder-ready **Decision Brief** with evidence, options, risks, and next steps. The artifact that travels from the engineer's analysis to the review board's decision.
 
 ### `/architecture-risk-review`
 
-Targeted review of failure modes, hidden dependencies, and operational burden for a specific architecture. Produces a **Hidden Risk Summary** with architectural focus.
+Focused risk assessment of a specific architecture — failure modes, hidden dependencies, single points of failure, blast radius, operational survivability. The questions a systems engineer asks before signing off on a design. Produces a **Hidden Risk Summary** with architectural focus.
 
 ## Agents
 

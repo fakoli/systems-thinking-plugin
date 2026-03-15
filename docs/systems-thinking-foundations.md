@@ -22,7 +22,7 @@ Surface events — an outage, a cost spike, a failed migration — are the visib
 
 ### Emergent properties
 
-Some behaviors exist only in the interaction between components, not in any single component's specification. A vendor's API may perform well in isolation but introduce a serialization bottleneck when composed with your event pipeline. A pricing model may look linear in the docs but compound non-linearly at scale breakpoints. These properties cannot be found by reading one document — they emerge from cross-referencing multiple sources against operational context.
+Some behaviors exist only in the interaction between components, not in any single component's specification. A vendor's API performs well in the demo but introduces a serialization bottleneck when composed with your event pipeline. A pricing model looks linear on the pricing page but compounds non-linearly at the scale breakpoints nobody told you about. A networking service works perfectly in a single region but creates asymmetric routing when you add the second region the vendor said was "supported." These properties cannot be found by reading one document — they emerge from cross-referencing multiple sources against operational context. This is the systems engineer's core skill: seeing the behavior that arises from composition, not from components in isolation.
 
 ### Stock and flow
 
