@@ -9,6 +9,9 @@
 
 set -uo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/discover-components.sh"
+
 input=$(cat)
 transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
 
@@ -16,11 +19,6 @@ transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
 if [ -z "$transcript_path" ] || [ ! -f "$transcript_path" ]; then
   exit 0
 fi
-
-# Match actual agent/skill invocations, not casual mentions.
-# These patterns target the structured JSON that Claude Code writes when
-# a subagent is launched or a skill is executed.
-INVOCATION_PATTERNS='("subagent_type"\s*:\s*"systems-thinking-plugin:|"skill"\s*:\s*"systems-thinking-plugin:|"subagent_type"\s*:\s*"(architecture-dependency-mapper|caveat-extractor|cost-capacity-analyst|doc-indexer|doc-reader|pattern-remix-planner|synthesis-brief-writer)"|"skill"\s*:\s*"(architecture-risk-review|complexity-mapper|context-sharding|decision-brief|pattern-remix)")'
 
 # Check if any systems-thinking component was actually invoked
 if ! grep -qE "$INVOCATION_PATTERNS" "$transcript_path" 2>/dev/null; then
