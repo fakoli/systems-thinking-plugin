@@ -1,7 +1,7 @@
 # systems-thinking-plugin
 
 <p align="center">
-  <img src="iceberg-logo.png" alt="Systems Thinking Plugin — the iceberg of hidden complexity" width="200">
+  <img src="iceberg-banner.png" alt="Systems Thinking Plugin — the iceberg of hidden complexity" width="800">
 </p>
 
 A Claude Code plugin that applies systems thinking to infrastructure and architecture decisions — surfacing what vendors don't show you, what consultants gloss over, and what only becomes visible when you're in production with no exit.
