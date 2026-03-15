@@ -2,9 +2,9 @@
 
 ## What systems thinking is
 
-Systems thinking is the discipline of understanding behavior that emerges from interactions between parts, not from parts in isolation. A load balancer works correctly on its own. An autoscaler works correctly on its own. Put them together without understanding their feedback loop and you get oscillation — the autoscaler adds capacity, the load balancer distributes traffic, latency drops, the autoscaler removes capacity, latency spikes, the autoscaler adds capacity again. The failure is not in either component. It is in the interaction.
+Systems thinking is the discipline of understanding behavior that emerges from interactions between parts — the stuff that kills you in production that wasn't obvious in the design doc. A load balancer works correctly on its own. An autoscaler works correctly on its own. Put them together without understanding their feedback loop and you get oscillation — the autoscaler adds capacity, the load balancer distributes traffic, latency drops, the autoscaler removes capacity, latency spikes, the autoscaler adds capacity again. The failure wasn't in either component. It was in the interaction. If you've operated infrastructure long enough, you've watched this exact scenario play out — and it's invisible until it's not.
 
-Infrastructure and architecture decisions fail the same way. Not because individual technologies are misunderstood, but because the interactions between them — cost mechanics, dependency chains, operational constraints, failure propagation paths — are invisible until too late. This plugin encodes a systems-thinking workflow that makes those interactions visible before they become incidents.
+Infrastructure and architecture decisions fail this way consistently. Not because technologies are misunderstood, but because the interactions between them — cost mechanics that compound at scale, dependency chains nobody mapped, vendor assumptions that don't match your operational reality, failure propagation paths that weren't in the sales pitch — are invisible until you've already committed months and budget. First you get the rosy part, because that's what sells it. Then you discover everything below the waterline. This plugin makes those interactions visible before they become incidents — or invoices.
 
 ## Core concepts that drive this plugin
 
@@ -18,7 +18,7 @@ Not all interventions are equal. Donella Meadows identified that changing system
 
 ### Iceberg model
 
-Surface events (an outage, a cost spike, a failed migration) are the visible tip. Below them sit patterns (recurring failures), structures (feedback loops, incentive misalignment, architectural coupling), and mental models (the assumptions teams carry about how their systems work). Extraction agents dig below the surface of documentation to find the structures and assumptions that drive observable behavior.
+Surface events — an outage, a cost spike, a failed migration — are the visible tip. They're also what vendors show you: the clean demo, the competitive pricing, the success stories. Below the waterline sit the patterns (the recurring failures nobody warned you about), the structures (feedback loops, incentive misalignment, where the vendor's architecture couples to yours), and the mental models (the assumptions your team carries about how the system works — assumptions that may have come straight from the vendor's pitch deck, not from production experience). Extraction agents dig below the surface of documentation to find the structures and assumptions that actually drive what happens when you operate the thing at scale.
 
 ### Emergent properties
 

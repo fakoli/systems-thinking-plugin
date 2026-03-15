@@ -1,19 +1,25 @@
 # systems-thinking-plugin
 
-A Claude Code plugin that applies systems thinking to infrastructure and architecture decisions — surfacing what gets missed when teams evaluate vendors, plan migrations, or design new systems.
+<p align="center">
+  <img src="iceberg-logo.png" alt="Systems Thinking Plugin — the iceberg of hidden complexity" width="200">
+</p>
+
+A Claude Code plugin that applies systems thinking to infrastructure and architecture decisions — surfacing what vendors don't show you, what consultants gloss over, and what only becomes visible when you're in production with no exit.
 
 ## Why this exists
 
-Most architecture failures don't come from choosing the wrong technology. They come from buried caveats in vendor docs nobody fully read, cost mechanics that only surface at scale, dependencies between systems that nobody mapped, and prior lessons that didn't transfer to the new project.
+After 25 years of building and operating infrastructure — networking, cloud engineering, storage, system administration, OS provisioning, and system programming — the pattern is always the same: first you get the rosy part, because that's what sells it. The vendor demo works. The POC looks clean. The pricing page makes sense. Then you commit, and you discover what was below the waterline the whole time — the quotas that bite at scale, the cost mechanics that compound non-linearly, the dependencies between services that nobody mapped, the caveats buried in page 47 of the docs.
 
-Senior engineers catch these things — but it takes time, context, and discipline. This plugin encodes that discipline into reusable workflows:
+This is the iceberg problem. The visible tip is what gets sold. The massive hidden mass below is what you actually have to operate. And if you've worked with enough contractors and consulting agencies, you've seen the other side of it too — the game of hooking you in and figuring out the rest on the way, as your money drains into problems that could have been surfaced upfront.
 
-- **Extract before you synthesize.** Separate the work of gathering facts from the work of drawing conclusions. Extraction agents pull out every technical claim, limitation, cost mechanic, and dependency — faithfully, with source anchors. Synthesis agents connect those findings into decisions only after extraction is complete.
-- **Preserve what you find.** Every finding traces back to a specific file, section, or page. No hallucinated certainty. No collapsed nuance. When a caveat says "supported in us-east-1 only," that's what gets reported — not "broadly available."
-- **Reuse what worked.** Prior designs, architecture decisions, and proven patterns are first-class inputs. The plugin adapts them to new constraints rather than starting from scratch, while flagging where the old context no longer applies.
-- **Produce artifacts that travel.** Outputs follow structured contracts (Decision Briefs, Risk Summaries, Complexity Heat Maps) designed for design reviews, stakeholder conversations, and handoffs — not just chat responses.
+This plugin encodes the discipline of looking below the waterline before you commit:
 
-The plugin is grounded in systems thinking — the discipline of understanding behavior that emerges from interactions between parts, not from parts in isolation. Extraction agents decompose a problem into components (reductionist analysis). Synthesis agents reassemble findings into a whole that accounts for dependencies, feedback loops, and emergent risks (holistic synthesis). This separation is the core method, not an implementation detail. See `docs/systems-thinking-foundations.md` for the full conceptual mapping.
+- **Extract before you synthesize.** Separate the work of gathering what a source *actually says* from the work of interpreting it. Extraction agents pull out every technical claim, limitation, cost mechanic, and dependency — faithfully, with source anchors. It's the difference between "what the vendor's doc claims" and "what you'll actually pay for." Synthesis agents connect those findings into decisions only after extraction is complete.
+- **Preserve what you find.** Every finding traces back to a specific file, section, or page. Not "broadly available" when it says "us-east-1 only." Not "supports X" when the doc says "supports X when Y is also true." No collapsed nuance. The caveats are where the real decisions live.
+- **Reuse what worked.** Prior designs, architecture decisions, and proven patterns are first-class inputs. The plugin adapts them to new constraints rather than starting from scratch, while flagging where the old context no longer applies. Lessons that got lost in the last vendor's sales pitch get carried forward.
+- **Produce artifacts that travel.** Outputs follow structured contracts (Decision Briefs, Risk Summaries, Complexity Heat Maps) designed for design reviews, stakeholder conversations, and handoffs — not confident guesses dressed up as analysis.
+
+Understanding what systems *don't* do well is as important as what they do well. This plugin builds different pathways to find those gaps and augment systems so you can actually build and scale them. See `docs/systems-thinking-foundations.md` for the full conceptual mapping.
 
 ## Install
 
@@ -51,7 +57,9 @@ Targeted review of failure modes, hidden dependencies, and operational burden fo
 
 ## Agents
 
-Nine subagents with narrow, auditable roles organized into three tiers:
+The visible tip of the iceberg is what the vendor shows you. Everything below the waterline is what these agents find.
+
+Nine subagents with narrow, auditable roles organized into three tiers — discovery agents cast the net, extraction agents pull out what matters, and synthesis agents connect it into decisions:
 
 ### Orchestration Agents (Discovery + Planning)
 

@@ -53,14 +53,14 @@ This implements the systems thinking practice of surfacing mental models explici
 
 ### 6. Optimize for senior engineering judgment
 
-The target user is a senior infrastructure or network engineer who needs to evaluate implementation burden, hidden risk, and decision quality. Outputs should be calibrated for that audience:
+The target user is a senior infrastructure or network engineer who has learned — sometimes the hard way — that vendors optimize for sales, not for your operational reality. You're here because you've seen the gap between the POC that looks great and the 3am incident that reveals what got glossed over. Outputs should be calibrated for that audience:
 
 - Skip introductory context the user already knows.
-- Surface non-obvious findings rather than restating what is already in the source.
-- Flag operational and implementation concerns that a junior engineer might miss.
-- Present tradeoffs, not just recommendations.
+- Surface non-obvious findings rather than restating what is already in the source. The obvious stuff is what the vendor already told you.
+- Flag operational and implementation concerns that a junior engineer might miss — and that a vendor's solution architect has no incentive to raise.
+- Present tradeoffs, not just recommendations. The tradeoffs are where the real decisions live.
 
-Systems thinking's goal is not to replace judgment but to improve the information that judgment operates on — surfacing leverage points and hidden dynamics that change the decision landscape.
+The goal is not to replace your judgment but to recover it — to surface what vendors bury, what consultants gloss over, and what only becomes visible when you're in production with no exit. Understanding what systems *don't* do well is as important as understanding what they do well.
 
 ---
 
