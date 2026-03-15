@@ -1,151 +1,168 @@
 # Systems Thinking Plugin
 
-A Claude Code plugin for senior infrastructure and network engineers. It surfaces hidden complexity, reuses proven patterns, and produces decision-ready artifacts — all local and file-based.
+A Claude Code plugin that encodes a systems engineer's methodology for evaluating infrastructure, architecture, and vendor proposals. It surfaces what's below the waterline — the hidden costs, buried caveats, scaling cliffs, and dependency traps that don't show up in the sales pitch or the POC.
 
-## Project Target
+## Key Commands
 
-- **Primary:** Claude Code local project usage
-- **Secondary:** Cursor compatibility later (document in COMPATIBILITY_NOTES.md, don't block on it)
+```bash
+# Run tests (fast — skips evals by default)
+uv run pytest tests/ -v
 
-## Core Workflows
+# Run evals (slow — invokes Claude CLI, shows cost/token tracking)
+uv run pytest -m slow -s
 
-### 1. Pattern Remix
-
-Use prior proven work, target-state goals, and constraints to generate high-quality first drafts and execution plans for new but related problems.
-
-### 2. Complexity Mapper
-
-Surface hidden complexity, side effects, risks, dependencies, and likely project blow-up points by analyzing documentation, costs, capacity, and operational constraints.
-
-### 3. Context Sharding
-
-Split large input across parallel subagents so narrower agents can extract structure, summaries, caveats, and signals before a primary agent synthesizes them.
+# Validate plugin structure
+python3 -m json.tool .claude-plugin/plugin.json > /dev/null
+```
 
 ## Architecture
 
-### Subagents (`agents/`)
+### Pipeline Flow
 
-Seven v1 subagents with narrow, auditable roles:
+```
+web-researcher → doc-indexer → extraction-planner → [parallel extractors] → synthesis-brief-writer
+   (discover)    (map structure)  (plan dispatch)    (scoped extraction)       (synthesize)
+```
 
-| Agent                            | Role                                                  | Type       |
-| -------------------------------- | ----------------------------------------------------- | ---------- |
-| `pattern-remix-planner`          | Convert prior examples + constraints into draft plans | Synthesis  |
-| `doc-indexer`                    | Map document structure, flag high-value sections      | Extraction |
-| `doc-reader`                     | Extract technical claims, limits, dependencies        | Extraction |
-| `caveat-extractor`               | Find limitations, quotas, buried traps                | Extraction |
-| `cost-capacity-analyst`          | Highlight cost mechanics, scaling constraints         | Extraction |
-| `architecture-dependency-mapper` | Map control/data-plane dependencies                   | Extraction |
-| `synthesis-brief-writer`         | Turn extracted evidence into decision briefs          | Synthesis  |
+Only `web-researcher` has web access (WebSearch + WebFetch). All other agents work on pre-discovered material. The `extraction-planner` prevents extractor overload by right-sizing parallelization before agents are spawned.
 
-For the systems thinking concepts that motivate this architecture, see `docs/systems-thinking-foundations.md`.
+### Agents (`agents/`)
+
+Nine subagents organized into three tiers:
+
+| Agent | Role | Model | Tier |
+|-------|------|-------|------|
+| `web-researcher` | Discover source material from web and local files | Sonnet | Orchestration |
+| `extraction-planner` | Assess material volume, produce Dispatch Plans | Haiku | Orchestration |
+| `doc-indexer` | Map document structure, flag high-value sections | Haiku | Extraction |
+| `doc-reader` | Extract technical claims, limits, dependencies | Haiku | Extraction |
+| `caveat-extractor` | Find buried limitations, quotas, traps | Sonnet | Extraction |
+| `cost-capacity-analyst` | Surface cost mechanics, scaling constraints | Sonnet | Extraction |
+| `architecture-dependency-mapper` | Map control/data-plane dependencies | Sonnet | Extraction |
+| `pattern-remix-planner` | Adapt prior work to new problems | Opus | Synthesis |
+| `synthesis-brief-writer` | Turn extracted evidence into decision briefs | Opus | Synthesis |
 
 ### Skills (`skills/`)
 
-Five reusable Markdown playbooks (each in `skills/<name>/SKILL.md`):
+Five slash-command skills, each orchestrating agents through the pipeline:
 
-- `pattern-remix` — generate first drafts from prior work
-- `complexity-mapper` — uncover hidden operational/cost/implementation complexity
-- `context-sharding` — break large source material into digestible packets
-- `decision-brief` — package findings for stakeholders
-- `architecture-risk-review` — targeted review of failure modes and dependencies
+| Skill | Purpose | Key Agents |
+|-------|---------|------------|
+| `/complexity-mapper` | Full below-the-waterline scan for hidden complexity | web-researcher → extraction-planner → all extractors → synthesis |
+| `/context-sharding` | Break large material into parallel extraction chunks | doc-indexer → extraction-planner → parallel doc-readers |
+| `/architecture-risk-review` | Targeted failure mode and dependency analysis | caveat-extractor + architecture-dependency-mapper → synthesis |
+| `/decision-brief` | Package findings into stakeholder-ready format | synthesis-brief-writer (consumes upstream outputs) |
+| `/pattern-remix` | Adapt prior proven work to new constraints | pattern-remix-planner |
 
-### Hooks
+### Hooks (`hooks/`)
 
-Minimal in v1. Only include if straightforward and robust:
+Three event hooks, all command-type (not prompt-type):
 
-- **Pre-flight reminder:** Reinforce extraction/synthesis separation before complex workflows
-- **Completion quality check:** Verify outputs include assumptions, risks, unresolved questions, next steps
+| Event | Script | Purpose |
+|-------|--------|---------|
+| `SessionStart` | Inline command | Check for `uv` and `jq` availability |
+| `UserPromptSubmit` | `user-prompt-gate.sh` | Inject extraction/synthesis reminder only when a systems-thinking skill is actively invoked |
+| `Stop` | `stop-quality-gate.sh` | Verify outputs include assumptions, risks, unresolved questions, next steps |
 
-If hooks feel brittle, stub or document them instead.
+**Hook safety rules:**
+- All hooks use `hooks` array wrapper (required by Claude Code)
+- No `set -e` in scripts (breaks `|| fallback` patterns)
+- No `cat | grep` (ARG_MAX failures on large transcripts)
+- Scripts grep transcript files directly
+- `discover-components.sh` auto-discovers skills/agents from directory structure (no hardcoded lists)
+- All command hooks have timeouts set
 
 ## Agent Design Principles
 
-1. **Separate extraction from synthesis.** Extraction agents gather facts. Synthesis agents connect findings into decisions. Never both.
-2. **Keep roles narrow.** One primary job per subagent, clear boundaries.
-3. **Preserve source anchors.** Always reference file, section, or source location.
-4. **Prefer structured outputs.** Predictable headings so downstream agents consume cleanly.
-5. **Avoid hallucinated certainty.** Call out ambiguity, missing data, low-confidence inferences.
-6. **Optimize for senior engineering judgment.** Help evaluate implementation burden, hidden risk, decision quality.
-
-### Extraction Agent Rules
-
-- Extract, do not over-interpret
-- Preserve nuance, return caveats and counterexamples
-- Include unknowns
-- Avoid final recommendations unless explicitly asked
-
-### Synthesis Agent Rules
-
-- Distinguish evidence from inference
-- Call out assumptions explicitly
-- Include unresolved questions
-- Avoid overselling certainty
-- Produce outputs useful in design reviews and stakeholder conversations
+1. **Separate extraction from synthesis.** Extraction agents gather facts. Synthesis agents draw conclusions. Never both in one agent.
+2. **Keep roles narrow.** One primary job per agent. The extraction-planner plans but doesn't extract. The web-researcher discovers but doesn't analyze.
+3. **Preserve source anchors.** Every finding references file, section, line number, or URL.
+4. **Right-size parallelization.** The extraction-planner assesses material volume before spawning extractors. Sizing heuristics: ≤5 sections → single extractor per type; 6-15 → 2 per type; 16-30 → 3-4 per type; 30+ → context-shard first.
+5. **Avoid hallucinated certainty.** Call out ambiguity, missing data, low-confidence inferences. Label `[from source]` vs `[inferred]`.
+6. **Optimize for senior engineering judgment.** Surface non-obvious findings. Skip introductory context. Present tradeoffs, not just recommendations.
 
 ## Output Contracts
 
-All deliverables must follow these structures:
+All deliverables follow structured formats defined in `docs/output-contracts.md`:
 
-### Hidden Risk Summary
+| Contract | Key Sections |
+|----------|-------------|
+| Hidden Risk Summary | scope reviewed, top risks, impact areas, assumptions, unresolved questions |
+| Complexity Heat Map | complexity areas ranked by severity, confidence, visibility |
+| Decision Brief | decision frame, options, evidence, inferred concerns, top risks, next steps |
+| Pattern Remix Draft | target outcome, reusable patterns, constraints, approach, risks |
+| Context Packet | source, scope, extracted findings, caveats, confidence notes |
+| Source Manifest | discovered URLs/paths, relevance, sections of interest, gaps |
+| Dispatch Plan | material summary, agent assignments, scoped instructions per agent |
 
-`scope reviewed` · `top hidden risks` · `likely impact areas` · `assumptions` · `unresolved questions` · `source anchors`
+## CI/CD
 
-### Complexity Heat Map
+### Tests (`.github/workflows/test.yml`)
 
-`complexity area` · `why it matters` · `severity` · `confidence` · `source anchors`
+Runs on push to main and on PRs:
+- `unit-and-contract` — pytest on `tests/unit` and `tests/contracts` (225 tests, ~0.3s)
+- `validate-plugin-structure` — JSON syntax, YAML frontmatter, file line counts
 
-### Decision Brief
+### Releases (`.github/workflows/release.yml`)
 
-`decision under review` · `options considered` · `evidence summary` · `inferred concerns` · `top risks` · `recommended next checks` · `unresolved questions`
+Triggers on PR merge to main:
+1. Reads version from `plugin.json` (canonical source)
+2. Checks if tag `v{version}` already exists — skips if so
+3. Verifies all 3 version files are in sync (`plugin.json`, `pyproject.toml`, `VERSION`)
+4. Extracts changelog section for this version from `CHANGELOG.md`
+5. Creates GitHub release with tag and changelog body
 
-### Pattern Remix Draft
+**To create a new release:** bump version in all 3 files, merge the PR.
 
-`target outcome` · `reusable prior patterns` · `constraints` · `proposed approach` · `implementation steps` · `known risks`
+### Evals (`tests/evals/`)
 
-### Context Packet
+Not in CI — run locally. Each eval invokes the Claude CLI with a prompt and grades the output:
+- Results saved to `tests/evals/results/<case>/` for inspection
+- Token usage and cost estimates printed per eval
+- Slow tests excluded by default (`pyproject.toml` sets `-m 'not slow'`)
 
-`source name` · `section/scope reviewed` · `extracted findings` · `caveats` · `confidence/ambiguity notes` · `source anchors`
+```bash
+uv run pytest -m slow -s          # run all evals with output
+uv run pytest -m slow -k complexity  # run specific eval
+```
 
-## Conventions
+## Versioning
 
-- Prefer many small composable files over one giant file
-- Markdown-based definitions for subagents and skills
-- Human-readable, consistent naming (`kebab-case` for files)
-- Scope tools deliberately for subagents
-- Protect context windows — don't overload them
-- No MCP in v1 unless clearly justified
-- No autonomous long-running systems
+Three files must stay in sync:
+- `.claude-plugin/plugin.json` — canonical source (Claude Code reads this)
+- `pyproject.toml` — Python package metadata
+- `VERSION` — plain text version file
 
 ## Reference Directory (`reference/`)
 
-An active reference library of material that informs agent behavior and grounds outputs in real prior work:
+User-curated materials that agents check during analysis:
 
-| Folder              | Contents                                               |
-| ------------------- | ------------------------------------------------------ |
-| `previous_designs/` | Prior design docs, proposals, architecture notes, ADRs |
-| `vendor_docs/`      | Vendor documentation, pricing, quotas, limitations     |
-| `prompts/`          | Effective prompts and patterns that worked before      |
-| `examples/`         | Example outputs showing desired behavior               |
+| Directory | Contents | Used By |
+|-----------|----------|---------|
+| `previous_designs/` | Prior design docs, ADRs, architecture notes | pattern-remix-planner, doc-indexer |
+| `vendor_docs/` | Vendor documentation, pricing, quotas, SLAs | all extraction agents, web-researcher |
+| `prompts/` | Effective prompts and analysis patterns | synthesis-brief-writer |
+| `examples/` | Example outputs showing the quality bar | synthesis-brief-writer, pattern-remix-planner |
 
-## Build Phases
+## Conventions
 
-- **Phase 0:** Infer resources from `reference/` and existing repo conventions
-- **Phase 1:** Discovery — propose structure, identify what goes where, list assumptions
-- **Phase 2:** Scaffold — create folders, write subagents, skills, hooks, config
-- **Phase 3:** Refine — tighten prompts, improve consistency, add usage examples
+- Markdown-based definitions for agents and skills
+- `kebab-case` for all file and directory names
+- Agent frontmatter: `name`, `model`, `color`, `description`, `allowed-tools`
+- Skill frontmatter: `name`, `description` (≥250 chars with trigger phrases, no `trigger` field)
+- Prefer many small composable files over one giant file
+- Scope tools deliberately — only `web-researcher` gets WebSearch/WebFetch
+- Tests skip evals by default (`-m 'not slow'` in pyproject.toml)
 
-## Plugin Manifest
+## Documentation
 
-The plugin uses the marketplace format:
-
-- `.claude-plugin/plugin.json` — manifest with name, description, version, author
-- `agents/` — subagent Markdown definitions
-- `skills/<name>/SKILL.md` — skill playbooks
-- `hooks/hooks.json` — event hooks (SessionStart, UserPromptSubmit, Stop)
-
-## Non-Goals (v1)
-
-- Deep Cursor-specific work
-- Polished UI or dashboards
-- Generalized enterprise workflow engine
-- Fully autonomous systems
+| File | Contents |
+|------|----------|
+| `README.md` | Why this exists, how it works walkthrough, workflows, agents |
+| `docs/systems-thinking-foundations.md` | Conceptual foundations, iceberg model, concept-to-capability mapping |
+| `docs/output-contracts.md` | Output format definitions |
+| `docs/agent-design-principles.md` | Agent design rationale |
+| `docs/repo-conventions.md` | Naming and structure conventions |
+| `examples/usage-scenarios.md` | 5 worked examples with agent flows |
+| `CHANGELOG.md` | Version history (Keep a Changelog format) |
+| `COMPATIBILITY_NOTES.md` | Cursor compatibility notes |
