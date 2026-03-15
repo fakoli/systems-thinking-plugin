@@ -1,6 +1,6 @@
 [project]
 name = "systems-thinking-plugin"
-version = "0.1.3"
+version = "0.2.0"
 description = "Claude Code plugin for infrastructure and network architecture decision workflows"
 requires-python = ">=3.11"
 dependencies = []
@@ -29,4 +29,4 @@ markers = [
     "eval: marks tests as eval tests (may require claude CLI)",
     "slow: marks tests as slow-running",
 ]
-addopts = "-v --tb=short"
+addopts = "-v --tb=short -m 'not slow'"

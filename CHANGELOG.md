@@ -5,6 +5,32 @@ All notable changes to the systems-thinking-plugin will be documented in this fi
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-03-14
+
+### Added
+
+- **web-researcher agent** — new discovery agent with WebSearch + WebFetch access for finding external source material (vendor docs, pricing pages, service quotas). Produces a structured Source Manifest for downstream extraction agents. Only agent with web access — all others remain read-only.
+- **extraction-planner agent** — new haiku-powered dispatch planning agent that assesses material volume and produces a Dispatch Plan specifying how many extraction agents to spawn, what type each should be, and what scoped instructions each receives. Prevents extractor overload observed in large research sessions.
+- **Collection phase in skill workflows** — complexity-mapper and architecture-risk-review now have optional web-researcher + extraction-planner steps before extraction. Context-sharding integrates extraction-planner for per-shard caveat extraction sizing.
+- **Regression tests** — `test_skill_frontmatter_has_no_trigger_field` prevents re-introduction of non-standard frontmatter; `test_skill_descriptions_are_long_enough` enforces minimum 250-char descriptions for reliable auto-matching.
+- **ORCHESTRATION_AGENTS test category** — web-researcher and extraction-planner are tested as orchestration agents (distinct from extraction and synthesis).
+- **LICENSE file** — MIT license added to match manifest declaration.
+
+### Fixed
+
+- **Skill frontmatter** — removed non-standard `trigger` field from all 5 skills (silently ignored by Claude Code). Expanded all descriptions from 77-118 chars to 250-450 chars with specific user trigger phrases.
+- **SessionStart hook** — added missing `"timeout": 5` to prevent potential indefinite hangs.
+- **pattern-remix SKILL.md** — fixed duplicated `reference/previous_designs/` entry in Step 1.
+- **discover-components.sh** — made executable (`chmod +x`) for consistency with other hook scripts.
+
+### Changed
+
+- **complexity-mapper workflow** — new steps: doc-indexer → (optional) web-researcher → extraction-planner → parallel extractors → synthesis. Previously launched extractors directly from doc-indexer output.
+- **architecture-risk-review workflow** — added optional web-researcher and extraction-planner steps before caveat-extractor and dependency-mapper.
+- **context-sharding workflow** — added optional web-researcher pre-step and extraction-planner for per-shard caveat extraction sizing.
+- **decision-brief workflow** — accepts Source Manifests and Dispatch Plans as valid input types.
+- **Agent count** — 9 agents (up from 7): 5 extraction, 2 synthesis, 2 orchestration.
+
 ## [0.1.3] - 2026-03-14
 
 ### Fixed

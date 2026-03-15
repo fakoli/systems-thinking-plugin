@@ -51,7 +51,16 @@ Targeted review of failure modes, hidden dependencies, and operational burden fo
 
 ## Agents
 
-Seven subagents with narrow, auditable roles. Each agent has a designated model tier to balance speed and quality:
+Nine subagents with narrow, auditable roles organized into three tiers:
+
+### Orchestration Agents (Discovery + Planning)
+
+| Agent | Role | Model |
+|-------|------|-------|
+| `web-researcher` | Discover source material from web and local files | Sonnet |
+| `extraction-planner` | Assess material volume, produce Dispatch Plans | Haiku |
+
+### Extraction Agents (Fast + Parallel)
 
 | Agent | Role | Model |
 |-------|------|-------|
@@ -60,10 +69,22 @@ Seven subagents with narrow, auditable roles. Each agent has a designated model 
 | `caveat-extractor` | Find buried limitations, quotas, traps | Sonnet |
 | `cost-capacity-analyst` | Surface cost mechanics, scaling constraints | Sonnet |
 | `architecture-dependency-mapper` | Map control/data-plane dependencies | Sonnet |
+
+### Synthesis Agents (High-Quality Output)
+
+| Agent | Role | Model |
+|-------|------|-------|
 | `pattern-remix-planner` | Adapt prior work to new problems | Opus |
 | `synthesis-brief-writer` | Turn extracted evidence into decision briefs | Opus |
 
-Extraction agents (Haiku/Sonnet) run fast and in parallel. Synthesis agents (Opus) run last and produce the final outputs.
+**Pipeline flow for research-heavy workflows:**
+
+```
+web-researcher → doc-indexer → extraction-planner → [parallel extractors] → synthesis-brief-writer
+   (discover)    (map structure)  (plan dispatch)    (scoped extraction)       (synthesize)
+```
+
+Only `web-researcher` has web access (WebSearch + WebFetch). All other agents work on pre-discovered material via Read, Grep, and Glob. The `extraction-planner` prevents extractor overload by right-sizing parallelization before agents are spawned.
 
 ## Reference material
 

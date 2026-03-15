@@ -92,3 +92,29 @@ def test_agent_frontmatter_has_allowed_tools(agent_file):
     )
     assert tools_key is not None, f"{agent_file.name} missing 'allowed-tools', 'allowed_tools', or 'tools'"
     assert isinstance(fm[tools_key], list), f"{agent_file.name}: {tools_key} should be a list"
+
+
+# ── Regression: no non-standard fields ──────────────────────────────────────
+
+
+@pytest.mark.parametrize("skill_file", SKILL_FILES, ids=_ids_skills(SKILL_FILES))
+def test_skill_frontmatter_has_no_trigger_field(skill_file):
+    """trigger is non-standard and silently ignored by Claude Code."""
+    fm, _ = parse_frontmatter(skill_file)
+    assert "trigger" not in fm, (
+        f"{skill_file.parent.name}/SKILL.md has non-standard 'trigger' field — "
+        "move trigger phrases into the 'description' field"
+    )
+
+
+# ── Description quality: minimum length ─────────────────────────────────────
+
+
+@pytest.mark.parametrize("skill_file", SKILL_FILES, ids=_ids_skills(SKILL_FILES))
+def test_skill_descriptions_are_long_enough(skill_file):
+    """Skill descriptions must be >= 250 chars for reliable auto-matching."""
+    fm, _ = parse_frontmatter(skill_file)
+    desc = str(fm.get("description", "")).strip()
+    assert len(desc) >= 250, (
+        f"{skill_file.parent.name}: description is {len(desc)} chars, need >= 250 for reliable triggering"
+    )

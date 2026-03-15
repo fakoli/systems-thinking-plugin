@@ -1,7 +1,7 @@
 {
   "name": "systems-thinking-plugin",
   "description": "Apply systems thinking to infrastructure and architecture decisions. Extract hidden risks from vendor docs, map architectural dependencies, reuse proven design patterns, and produce structured decision-ready artifacts — all grounded in source evidence.",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "author": {
     "name": "Sekou Doumbouya"
   },
