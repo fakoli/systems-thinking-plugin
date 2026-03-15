@@ -86,8 +86,9 @@ def test_hooks_use_nested_wrapper_schema(hooks):
                     )
 
 
-def test_preflight_hook_is_prompt_type(preflight_hook):
-    assert preflight_hook["type"] == "prompt"
+def test_preflight_hook_is_command_type(preflight_hook):
+    """UserPromptSubmit hook uses a command gate to scope to systems-thinking sessions."""
+    assert preflight_hook["type"] == "command"
 
 
 def test_completion_hook_is_command_type(completion_hook):
@@ -108,15 +109,30 @@ def test_completion_hook_uses_plugin_root(completion_hook):
 # ── Content tests ────────────────────────────────────────────────────────────
 
 
-def test_preflight_prompt_mentions_extraction_synthesis(preflight_hook):
-    prompt = preflight_hook["prompt"].lower()
-    assert "extraction" in prompt, "Preflight prompt should mention extraction"
-    assert "synthesis" in prompt, "Preflight prompt should mention synthesis"
+@pytest.fixture
+def user_prompt_gate_path():
+    from pathlib import Path
+    return Path(__file__).resolve().parents[2] / "hooks" / "user-prompt-gate.sh"
 
 
-def test_preflight_prompt_mentions_source_anchors(preflight_hook):
-    prompt = preflight_hook["prompt"].lower()
-    assert "source" in prompt, "Preflight prompt should mention source"
+def test_user_prompt_gate_exists(user_prompt_gate_path):
+    assert user_prompt_gate_path.is_file(), "user-prompt-gate.sh must exist in hooks/"
+
+
+def test_preflight_references_gate_script(preflight_hook):
+    """UserPromptSubmit hook must reference the user-prompt-gate script."""
+    assert "user-prompt-gate.sh" in preflight_hook["command"]
+
+
+def test_preflight_gate_mentions_extraction_synthesis(user_prompt_gate_path):
+    content = user_prompt_gate_path.read_text().lower()
+    assert "extraction" in content, "Preflight gate should mention extraction"
+    assert "synthesis" in content, "Preflight gate should mention synthesis"
+
+
+def test_preflight_gate_mentions_source_anchors(user_prompt_gate_path):
+    content = user_prompt_gate_path.read_text().lower()
+    assert "source" in content, "Preflight gate should mention source"
 
 
 # ── Gate script tests ───────────────────────────────────────────────────────
@@ -141,11 +157,29 @@ def test_gate_script_checks_quality_keywords(gate_script_path):
     assert "next step" in content or "next check" in content
 
 
-def test_gate_script_checks_systems_thinking_patterns(gate_script_path):
-    """Gate script must check for systems-thinking agent/skill identifiers."""
-    content = gate_script_path.read_text().lower()
-    assert "systems-thinking" in content
-    assert "architecture-dependency-mapper" in content or "caveat-extractor" in content
+@pytest.fixture
+def discover_script_path():
+    from pathlib import Path
+    return Path(__file__).resolve().parents[2] / "hooks" / "discover-components.sh"
+
+
+def test_discover_script_exists(discover_script_path):
+    assert discover_script_path.is_file(), "discover-components.sh must exist in hooks/"
+
+
+def test_gate_script_sources_discover_components(gate_script_path):
+    """Gate script must source discover-components.sh for dynamic pattern discovery."""
+    content = gate_script_path.read_text()
+    assert "discover-components.sh" in content
+
+
+def test_discover_script_reads_skills_and_agents(discover_script_path):
+    """discover-components.sh must read from skills/ and agents/ directories."""
+    content = discover_script_path.read_text()
+    assert "skills" in content, "Discovery script must reference skills directory"
+    assert "agents" in content, "Discovery script must reference agents directory"
+    assert "INVOCATION_PATTERNS" in content, "Discovery script must export INVOCATION_PATTERNS"
+    assert "systems-thinking" in content.lower()
 
 
 def test_gate_script_does_not_use_set_e(gate_script_path):
