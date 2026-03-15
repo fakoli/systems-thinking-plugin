@@ -5,6 +5,18 @@ All notable changes to the systems-thinking-plugin will be documented in this fi
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-03-14
+
+### Fixed
+
+- **Stop hook false positives:** Quality gate no longer triggers on casual mentions of plugin names — now matches only actual agent/skill invocations in the transcript
+- **UserPromptSubmit fires on every message:** Converted from static prompt hook to command-based gate that only injects the extraction/synthesis reminder when systems-thinking workflows are active
+- **stop-quality-gate.sh reliability:** Grep transcript file directly instead of loading into a variable; dropped `set -e` to prevent silent early exits
+
+### Added
+
+- `hooks/user-prompt-gate.sh` — scoped prompt injection that checks user prompt keywords and transcript for active systems-thinking invocations
+
 ## [0.1.0] - 2026-03-11
 
 ### Added
