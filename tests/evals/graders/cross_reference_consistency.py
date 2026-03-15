@@ -118,7 +118,13 @@ def grade_cross_reference_consistency(
         all_isolated.extend(sorted(isolated)[:5])
 
     if pair_count == 0:
-        return {"pass": True, "score": 1.0, "overlapping_terms": [], "isolated_terms": []}
+        return {
+            "pass": False,
+            "score": 0.0,
+            "overlapping_terms": [],
+            "isolated_terms": [],
+            "error": "No configured section pairs were found in the output",
+        }
 
     avg_overlap = total_overlap / pair_count
 
