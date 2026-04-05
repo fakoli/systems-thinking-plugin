@@ -55,30 +55,7 @@ Multiple instances run in parallel, each with its own full context window. They 
 
 **Architecture:**
 
-```
-┌──────────────────────────────────────────────────┐
-│  ORCHESTRATOR (Python script or main Claude)     │
-│                                                  │
-│  1. Run deterministic pre-processing             │
-│  2. Spawn N parallel claude CLI workers          │
-│  3. Wait for all workers to complete             │
-│  4. Aggregate results from output files          │
-│  5. Spawn synthesis worker (or return to parent) │
-└──────────┬───────────┬───────────┬───────────────┘
-           │           │           │
-           ▼           ▼           ▼
-      ┌────────┐  ┌────────┐  ┌────────┐
-      │Worker 1│  │Worker 2│  │Worker 3│
-      │200K ctx│  │200K ctx│  │200K ctx│
-      │        │  │        │  │        │
-      │Read    │  │Read    │  │Read    │
-      │section │  │section │  │section │
-      │1-3     │  │4-6     │  │7-9     │
-      │        │  │        │  │        │
-      │Write:  │  │Write:  │  │Write:  │
-      │out/1.md│  │out/2.md│  │out/3.md│
-      └────────┘  └────────┘  └────────┘
-```
+![Parallel Worker Orchestration](images/parallel-workers.png)
 
 **Key advantage**: true parallelism. Three extraction workers finish in the time of one.
 
@@ -150,60 +127,7 @@ When a subagent finishes, it returns a structured handoff that tells the parent 
 
 Combine all three paths:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  SKILL INVOCATION (main Claude session)                     │
-│  User: "Run complexity-mapper on this vendor doc"           │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│  PHASE 1: DETERMINISTIC PRE-PROCESSING (Python scripts)    │
-│  • index-doc.py → document map, section boundaries         │
-│  • scan-patterns.py → known pattern matches                │
-│  • estimate-tokens.py → token budget per section           │
-│  • slice-sections.py → individual section files            │
-│  Output: work-plan.json (what to analyze, how to shard)    │
-│  Time: ~500ms, zero tokens                                 │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│  PHASE 2: PARALLEL LLM EXTRACTION (background CLI workers) │
-│  orchestrate.py reads work-plan.json, spawns N workers:    │
-│  • Worker 1: caveat-extractor on sections 1-4              │
-│  • Worker 2: cost-capacity-analyst on pricing sections     │
-│  • Worker 3: dependency-mapper on architecture sections    │
-│  Each writes structured findings to output/findings/       │
-│  Time: ~30-60s (parallel), uses N × 200K context windows   │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│  PHASE 3: AGGREGATION (Python script)                      │
-│  aggregate.py merges all findings into:                    │
-│  • output/aggregated-findings.md (structured, compact)     │
-│  • output/full-evidence.md (complete, for deep dives)      │
-│  Time: ~100ms, zero tokens                                 │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│  PHASE 4: SYNTHESIS (single LLM agent or CLI worker)       │
-│  synthesis-brief-writer receives ONLY:                     │
-│  • aggregated-findings.md (~2-5K tokens)                   │
-│  • Pointer to full-evidence.md for follow-up               │
-│  Produces: Decision Brief / Complexity Heat Map / etc.     │
-│  Time: ~20-30s                                             │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│  RETURN TO MAIN SESSION                                    │
-│  Parent reads final artifact from output/                  │
-│  Context cost: ~3-5K tokens (not 50-100K)                  │
-└─────────────────────────────────────────────────────────────┘
-```
+![Hybrid Architecture Pipeline](images/hybrid-pipeline.png)
 
 ### Why This Works
 
@@ -291,17 +215,7 @@ Workers run in visible tmux panes. You can:
 
 **tmux pane layout for 3 workers:**
 
-```
-┌─────────────────────────┬─────────────────────────┐
-│  caveat-extractor       │  cost-capacity-analyst   │
-│  Reading sections 3,4,5 │  Reading sections 3,2,9  │
-│  ...                    │  ...                     │
-├─────────────────────────┴─────────────────────────┤
-│  architecture-dependency-mapper                    │
-│  Reading section 6                                 │
-│  ...                                               │
-└───────────────────────────────────────────────────┘
-```
+![tmux Pane Layout](images/tmux-layout.png)
 
 **When to use which:**
 
