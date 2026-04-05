@@ -268,11 +268,36 @@ uv run pytest tests/evals -v -k complexity_mapper
 python tests/evals/harness.py --dry-run
 ```
 
+## Works with fakoli-flow
+
+This plugin is compatible with the **fakoli-flow** orchestration plugin. When
+both are installed, fakoli-flow can dispatch systems-thinking agents in waves —
+running discovery agents, then parallel extraction agents, then synthesis —
+with the wave engine managing sequencing, status tracking, and critic gates.
+
+### Wave mapping
+
+| Wave | Agents | Purpose |
+|---|---|---|
+| Wave 1 | `web-researcher`, `extraction-planner` | Discover source material, produce Dispatch Plan |
+| Wave 2 | `doc-indexer`, `doc-reader`, `caveat-extractor`, `cost-capacity-analyst`, `architecture-dependency-mapper` | Parallel extraction — each agent works on its assigned scope |
+| Wave 3 | `synthesis-brief-writer` | Turn Wave 2 evidence into decision artifacts |
+
+Agents communicate between waves by writing status files to
+`docs/plans/agent-<name>-status.md`. The wave engine reads these after each
+wave to confirm completion and pass key decisions to the next wave's dispatch
+prompt.
+
+See `docs/flow-protocol.md` for the full wave mapping and status file format,
+and `docs/status-file-template.md` for the template agents use.
+
 ## Further reading
 
 - `docs/systems-thinking-foundations.md` — Conceptual foundations and concept-to-capability mapping
 - `docs/output-contracts.md` — Output format definitions
 - `docs/agent-design-principles.md` — Agent design rationale
 - `docs/repo-conventions.md` — Naming and structure conventions
+- `docs/flow-protocol.md` — fakoli-flow wave mapping and status file protocol
+- `docs/status-file-template.md` — Status file template for wave-based execution
 - `examples/usage-scenarios.md` — Worked examples with agent flows
 - `COMPATIBILITY_NOTES.md` — Cursor compatibility notes

@@ -5,6 +5,18 @@ All notable changes to the systems-thinking-plugin will be documented in this fi
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-04-02
+
+### Added
+
+- **docs/flow-protocol.md** — maps the 3-tier pipeline (Discovery, Extraction, Synthesis) to the fakoli-flow wave model. Defines Wave 1 (web-researcher + extraction-planner), Wave 2 (all five extraction agents in parallel), and Wave 3 (synthesis-brief-writer). Describes what each agent writes in its "Decisions" section so the wave engine can pass findings forward without re-reading all extraction outputs.
+- **docs/status-file-template.md** — copy-paste status file template for wave-based execution. Includes status values (IN_PROGRESS / COMPLETE / NEEDS_REVIEW / BLOCKED), per-agent guidance on what to write in "Decisions", and a worked example for caveat-extractor.
+- **fakoli-flow compatibility section in README.md** — "Works with fakoli-flow" section explaining how the orchestrator dispatches systems-thinking agents as a wave pipeline, with the wave mapping table and links to the new protocol docs.
+
+### Changed
+
+- **Version bumped** from 0.2.0 to 0.3.0 in plugin.json, pyproject.toml, and VERSION.
+
 ## [0.2.0] - 2026-03-14
 
 ### Added
